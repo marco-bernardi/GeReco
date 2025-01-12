@@ -1,0 +1,23 @@
+Test Data
+
+-data set rock, paper, ...
+Test loss:0.49700918793678284, Test accuracy:0.7083333134651184
+
+Modello con lr=0.003 e dropout=0.2:
+Test loss:0.4362185001373291, Test accuracy:0.75
+
+-hagrid ridotto (contesto del corpo)
+Test loss:0.25240442156791687, Test accuracy:0.9074074029922485
+
+Modello con lr=0.003 e dropout=0.2:
+Test loss:0.3453475832939148, Test accuracy:0.9074074029922485
+
+
+-hagrid ridotto con none + cartelle delle gesture effettive
+Modello con lr=0.003 e dropout=0.2:
+Test loss:0.20843610167503357, Test accuracy:0.876447856426239
+
+
+Gesture dinamiche:
+- mano destra, da destra a sinistra: cancella un carattere
+
