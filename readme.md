@@ -1,4 +1,4 @@
-# GeReco - Gesture Recognition
+# GestoFlow
 
 ## Vision & Cognitive Systems Project
 
