@@ -21,6 +21,6 @@ Gesture statiche:
 - indice su: scrittura
 - fist: cancella parola
 - Mano aperta inversa: a capo 
-- 2: cambia tastiera (numeri, punteggiatura, etc)
-- 3: cambia tastiera (ritorna alle lettere)
+- 2: cambia tastiera (numeri, punteggiatura, etc) + viceversa
 
+/root/.cache/kagglehub/datasets/augmented_dataset/
