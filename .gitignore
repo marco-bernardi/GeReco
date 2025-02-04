@@ -1,3 +1,5 @@
 *.task
 .venv/*
 .vscode/*
+rgb_blur_split
+preprocessed_data.pkl
