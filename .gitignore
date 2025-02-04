@@ -3,3 +3,10 @@
 .vscode/*
 rgb_blur_split
 preprocessed_data.pkl
+
+# .tex files
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.pdf
