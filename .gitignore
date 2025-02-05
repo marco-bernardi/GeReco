@@ -10,3 +10,5 @@ preprocessed_data.pkl
 *.out
 *.synctex.gz
 *.pdf
+
+.DS_Store
