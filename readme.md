@@ -1,4 +1,4 @@
-# GestoFlow
+# GeReco
 
 ## Vision & Cognitive Systems Project
 
