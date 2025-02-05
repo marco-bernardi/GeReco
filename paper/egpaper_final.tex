@@ -51,30 +51,62 @@ Sebastiano Sanson\\
 %%%%%%%%% BODY TEXT
 \section{Introduction}
 Gesture recognition is a significant research area in computer vision and machine learning. It can be used in various applications and this is why it is an important topic to study.
-The goal of this project is to study, implement and test some approaches to gesture recognition, focusing on both static and dynamic gestures. We also tried 
-to implement a real time gesture recognition system using a webcam and the developed models.
+The goal of this project is to study, implement and test some approaches to gesture recognition, focusing on both static and dynamic gestures: in the first one we recognize the position of 
+the hand while in the second one we recognize the movement. 
+We also tried to implement a real time gesture recognition system using a webcam and the developed models.
 \section{Related Work}
 There are many apporaches to gesture recognition. What we have done is to study some of them and try to implement or to use transfer learning to adapt them to our problem.
-Finally we decided to use Mediapipe \cite{lugaresi2019mediapipeframeworkbuildingperception} \cite{zhang2020mediapipehandsondevicerealtime} to detect static gesture and 
-a custom model to detect dynamic gestures taken from \cite{electronics13163233}. This last model is based on Mediapipe, InceptionV3 and a LSTM layer.
+Finally we decided to use the MediaPipe Hands \cite{zhang2020mediapipehandsondevicerealtime}, developed through Mediapipe \cite{lugaresi2019mediapipeframeworkbuildingperception} 
+to detect static gesture and a custom model to detect dynamic gestures similar to that one shown in this paper \cite{electronics13163233}. 
+This last model is based on Mediapipe, InceptionV3 and a LSTM layer.
 
 \section{Dataset}
-Clearly the dataset is a crucial part of the project and obviously we needed two kind of dataset:
+Clearly the dataset is a crucial part of the project and obviously we needed two kind of dataset. For the static gestures 
+we used a dataset of images while for the dynamic gestures we used a dataset of videos:
 \begin{itemize}
-   \item A dataset of \textbf{static gestures}: we used a reduced version of the \textit{HaGRID dataset} \cite{Alexander_2024}. The original size dataset
+   \item Dataset of \textbf{static gestures}: we used a reduced version of the \textit{HaGRID dataset} \cite{Alexander_2024}. The original size dataset
    is too big for our purposes and for our resources, so we decided to use a reduced version of it. The original dataset contains about 550000 FullHD images (716GB)
    divided in 18 classes of gestures. We decided to use only about 2000 images divided in 6 classes of gestures.
-   \item A dataset of \textbf{dynamic gestures}: we used the \textit{Depth camera based dataset of hand gestures} \cite{JEERU2022108659}. In this case there are about 4000 videos of 
+   \item Dataset of \textbf{dynamic gestures}: we used the \textit{Depth camera based dataset of hand gestures} \cite{JEERU2022108659}. In this case there are about 4000 videos of 
    6 different gestures.
 \end{itemize}
 
 \section{Method}
 \subsection{Static gestures}
+Mediapipe provides a good solution for hand detection and tracking. We used it to detect the hand classify the gestures.
+The complex part here was to understand how to improve the accuracy of the model and we made it by using transfer learning, data augmentation and hyperparameters tuning.
 \subsubsection{Data preprocessing}
-- data augmentation
+For image processing it was important to choose those transformations that did not have the risk of cutting off the hands. We decided to use: rotation, scaling, 
+brightness-contrast, color conversion, blur, noise, sharpening. All this transformations were applied with random parameters.
+We tried different percentages in addition to the initial dataset and the one which gave us the best results was 25\%.  
 \subsubsection{Model}
-- Mediapipe
-- transfer learning
+Mediapipe is a framework for building pipelines to perform infernce over arbitrary sensory data. This has been used to develop a model that can detect the hand and classify the gesture.
+The ML pipeline of this is composed by two models working together:
+\begin{itemize}
+   \item \textbf{Palm detector}: operates on a full input image and locates palms via an oriented hand bounding box. The advantage of detecting the palm instead of the hand 
+   is that it is a more rigid structure and it is easier to detect. The feature extraction is done via an encoder-decoder architecture. The idea is to make a recall to the 
+   \textit{Feature pyramid networks}:
+   \begin{enumerate}
+      \item \textit{Bottom-up pathway}: a ConvNet generates feature maps at multiple scales. The deeper layers contain more rich semantic information;
+      \item \textit{Top-down pathway}: Upsample the feature maps and merge them with the corresponding feature maps through lateral connections (from the bottom-up pathway).
+      This allows to recover the spatial information lost during the downsampling.
+   \end{enumerate}
+   \item \textbf{Hand landmark model}: operates on the cropped hand bounding box and return the landmarks. 
+   The model makes a regression to estimate the coordinates of the 21 hand's landmarks. It will return also the probability of the presence of the hand and 
+   the indication if the hand is left or right.
+\end{itemize}
+We did transfer learning on this model by training only the last layer of the model such that the model can learn to classify the gestures we needed.
+For the fine-tuning of the model we modified the sequent hyperparameters, it's reported the best configuration we found:
+\begin{itemize}
+   \item learning\_rate = 0.0002;
+   \item lr\_decay = 0.99 - Learning rate decay to use for gradient descent training;
+   \item epochcs = 30;
+   \item shuffle = True - True if the dataset is shuffled before training, this is done in order to avoid the model to have some bias;
+   \item batch\_size = 128 - trade-off between speed and accuracy. It helped us also in reducing the overfitting;
+   \item dropout\_rate = 0.1 - The fraction of the input units to drop, this is used to avoid overfitting;
+   \item layer\_widths = [1024, 512, 256, 128, 64] - A list of hidden layer widths for the gesture model. Each element in the list will 
+   create a new hidden layer with the specified width.
+\end{itemize}
 \subsection{Dynamic gestures}
 \subsubsection{Data preprocessing}
 - 10 frames crop hand
@@ -87,6 +119,7 @@ Clearly the dataset is a crucial part of the project and obviously we needed two
 \subsection{Real time gesture recognition}
 
 \section{Experiments}
+(20\%, 25\%, 30\%, 35\%, 40\%, 100\%)
 
 \section{Conclusion}
 
