@@ -21,7 +21,6 @@
 
 % Pages are numbered in submission mode, and unnumbered in camera-ready
 %\ifcvprfinal\pagestyle{empty}\fi
-\setcounter{page}{4321}
 \begin{document}
 
 %%%%%%%%% TITLE
@@ -51,16 +50,80 @@ Sebastiano Sanson\\
 
 %%%%%%%%% BODY TEXT
 \section{Introduction}
+Gesture recognition is a significant research area in computer vision and machine learning. It can be used in various applications and this is why it is an important topic to study.
+The goal of this project is to study, implement and test some approaches to gesture recognition, focusing on both static and dynamic gestures: in the first one we recognize the position of 
+the hand while in the second one we recognize the movement. 
+We also tried to implement a real time gesture recognition system using a webcam and the developed models.
+\section{Related Work}
+There are many apporaches to gesture recognition. What we have done is to study some of them and try to implement or to use transfer learning to adapt them to our problem.
+Finally we decided to use the MediaPipe Hands \cite{zhang2020mediapipehandsondevicerealtime}, developed through Mediapipe \cite{lugaresi2019mediapipeframeworkbuildingperception} 
+to detect static gesture and a custom model to detect dynamic gestures similar to that one shown in this paper \cite{electronics13163233}. 
+This last model is based on Mediapipe, InceptionV3 and a LSTM layer.
 
-Please follow the guidelines that have been uploaded on Moodle. Remember also that the report should be no longer than six pages (plus references).
+\section{Dataset}
+Clearly the dataset is a crucial part of the project and obviously we needed two kind of dataset. For the static gestures 
+we used a dataset of images while for the dynamic gestures we used a dataset of videos:
+\begin{itemize}
+   \item Dataset of \textbf{static gestures}: we used a reduced version of the \textit{HaGRID dataset} \cite{Alexander_2024}. The original size dataset
+   is too big for our purposes and for our resources, so we decided to use a reduced version of it. The original dataset contains about 550000 FullHD images (716GB)
+   divided in 18 classes of gestures. We decided to use only about 2000 images divided in 6 classes of gestures.
+   \item Dataset of \textbf{dynamic gestures}: we used the \textit{Depth camera based dataset of hand gestures} \cite{JEERU2022108659}. In this case there are about 4000 videos of 
+   6 different gestures.
+\end{itemize}
 
-\subsection{Language}
+\section{Method}
+\subsection{Static gestures}
+Mediapipe provides a good solution for hand detection and tracking. We used it to detect the hand classify the gestures.
+The complex part here was to understand how to improve the accuracy of the model and we made it by using transfer learning, data augmentation and hyperparameters tuning.
+\subsubsection{Data preprocessing}
+For image processing it was important to choose those transformations that did not have the risk of cutting off the hands. We decided to use: rotation, scaling, 
+brightness-contrast, color conversion, blur, noise, sharpening. All this transformations were applied with random parameters.
+We tried different percentages in addition to the initial dataset and the one which gave us the best results was 25\%.  
+\subsubsection{Model}
+Mediapipe is a framework for building pipelines to perform infernce over arbitrary sensory data. This has been used to develop a model that can detect the hand and classify the gesture.
+The ML pipeline of this is composed by two models working together:
+\begin{itemize}
+   \item \textbf{Palm detector}: operates on a full input image and locates palms via an oriented hand bounding box. The advantage of detecting the palm instead of the hand 
+   is that it is a more rigid structure and it is easier to detect. The feature extraction is done via an encoder-decoder architecture. The idea is to make a recall to the 
+   \textit{Feature pyramid networks}:
+   \begin{enumerate}
+      \item \textit{Bottom-up pathway}: a ConvNet generates feature maps at multiple scales. The deeper layers contain more rich semantic information;
+      \item \textit{Top-down pathway}: Upsample the feature maps and merge them with the corresponding feature maps through lateral connections (from the bottom-up pathway).
+      This allows to recover the spatial information lost during the downsampling.
+   \end{enumerate}
+   \item \textbf{Hand landmark model}: operates on the cropped hand bounding box and return the landmarks. 
+   The model makes a regression to estimate the coordinates of the 21 hand's landmarks. It will return also the probability of the presence of the hand and 
+   the indication if the hand is left or right.
+\end{itemize}
+We did transfer learning on this model by training only the last layer of the model such that the model can learn to classify the gestures we needed.
+For the fine-tuning of the model we modified the sequent hyperparameters, it's reported the best configuration we found:
+\begin{itemize}
+   \item learning\_rate = 0.0002;
+   \item lr\_decay = 0.99 - Learning rate decay to use for gradient descent training;
+   \item epohcs = 30;
+   \item shuffle = True - True if the dataset is shuffled before training, this is done in order to avoid the model to have some bias;
+   \item batch\_size = 128 - trade-off between speed and accuracy. It helped us also in reducing the overfitting;
+   \item dropout\_rate = 0.1 - The fraction of the input units to drop, this is used to avoid overfitting;
+   \item layer\_widths = [1024, 512, 256, 128, 64] - A list of hidden layer widths for the gesture model. Each element in the list will 
+   create a new hidden layer with the specified width.
+\end{itemize}
+\subsection{Dynamic gestures}
+\subsubsection{Data preprocessing}
+- 10 frames crop hand
+- sharpening
+- 10 frames on BODY
+\subsubsection{Model}
+-Mediapipe
+-InceptionV3
+-LSTM: accept fixed size
+\subsection{Real time gesture recognition}
 
-All manuscripts must be in English.
+\section{Experiments}
+(20\%, 25\%, 30\%, 35\%, 40\%, 100\%)
 
-\subsection{Suggested Structure}
+\section{Conclusion}
 
-The following is a suggested structure for your report:
+
 
 \begin{itemize}
 	\item Introduction (10\%): describe the problem you are working on, why it's important, and an overview of your results.
@@ -71,138 +134,14 @@ The following is a suggested structure for your report:
 	\item Conclusion (5\%): summarize your key results; what have you learned? Suggest ideas for future extensions.
 \end{itemize}	
 
-%------------------------------------------------------------------------
-\section{Formatting your paper}
-
-All text must be in a two-column format. The total allowable width of the
-text area is $6\frac78$ inches (17.5 cm) wide by $8\frac78$ inches (22.54
-cm) high. Columns are to be $3\frac14$ inches (8.25 cm) wide, with a
-$\frac{5}{16}$ inch (0.8 cm) space between them. The main title (on the
-first page) should begin 1.0 inch (2.54 cm) from the top edge of the
-page. The second and following pages should begin 1.0 inch (2.54 cm) from
-the top edge. On all pages, the bottom margin should be 1-1/8 inches (2.86
-cm) from the bottom edge of the page for $8.5 \times 11$-inch paper; for A4
-paper, approximately 1-5/8 inches (4.13 cm) from the bottom edge of the
-page.
-
-%-------------------------------------------------------------------------
-\subsection{Margins and page numbering}
-
-All printed material, including text, illustrations, and charts, must be kept
-within a print area 6-7/8 inches (17.5 cm) wide by 8-7/8 inches (22.54 cm)
-high.
-Page numbers should be in footer with page numbers, centered and .75
-inches from the bottom of the page and make it start at the correct page
-number rather than the 4321 in the example.  To do this fine the line (around
-line 23)
-\begin{verbatim}
-%\ifcvprfinal\pagestyle{empty}\fi
-\setcounter{page}{4321}
-\end{verbatim}
-where the number 4321 is your assigned starting page.
-
-Make sure the first page is numbered by commenting out the first page being
-empty on line 46
-\begin{verbatim}
-%\thispagestyle{empty}
-\end{verbatim}
 
 
-%-------------------------------------------------------------------------
-\subsection{Type-style and fonts}
-
-Wherever Times is specified, Times Roman may also be used. If neither is
-available on your word processor, please use the font closest in
-appearance to Times to which you have access.
-
-MAIN TITLE. Center the title 1-3/8 inches (3.49 cm) from the top edge of
-the first page. The title should be in Times 14-point, boldface type.
-Capitalize the first letter of nouns, pronouns, verbs, adjectives, and
-adverbs; do not capitalize articles, coordinate conjunctions, or
-prepositions (unless the title begins with such a word). Leave two blank
-lines after the title.
-
-AUTHOR NAME(s) and AFFILIATION(s) are to be centered beneath the title
-and printed in Times 12-point, non-boldface type. This information is to
-be followed by two blank lines.
-
-The ABSTRACT and MAIN TEXT are to be in a two-column format.
-
-MAIN TEXT. Type main text in 10-point Times, single-spaced. Do NOT use
-double-spacing. All paragraphs should be indented 1 pica (approx. 1/6
-inch or 0.422 cm). Make sure your text is fully justified---that is,
-flush left and flush right. Please do not place any additional blank
-lines between paragraphs.
-
-Figure and table captions should be 9-point Roman type as in
-Table~\ref{mytable}. Short captions should be centred.
-
-\noindent Callouts should be 9-point Helvetica, non-boldface type.
-Initially capitalize only the first word of section titles and first-,
-second-, and third-order headings.
-
-FIRST-ORDER HEADINGS. (For example, {\large \bf 1. Introduction})
-should be Times 12-point boldface, initially capitalized, flush left,
-with one blank line before, and one blank line after.
-
-SECOND-ORDER HEADINGS. (For example, { \bf 1.1. Database elements})
-should be Times 11-point boldface, initially capitalized, flush left,
-with one blank line before, and one after. If you require a third-order
-heading (we discourage it), use 10-point Times, boldface, initially
-capitalized, flush left, preceded by one blank line, followed by a period
-and your text on the same line.
-
-%-------------------------------------------------------------------------
-\subsection{Footnotes}
-
-Please use footnotes\footnote {This is what a footnote looks like.  It
-often distracts the reader from the main flow of the argument.} sparingly.
-Indeed, try to avoid footnotes altogether and include necessary peripheral
-observations in
-the text (within parentheses, if you prefer, as in this sentence).  If you
-wish to use a footnote, place it at the bottom of the column on the page on
-which it is referenced. Use Times 8-point type, single-spaced.
 
 
-%-------------------------------------------------------------------------
-\subsection{References}
-
-List and number all bibliographical references in 9-point Times,
-single-spaced, at the end of your paper. When referenced in the text,
-enclose the citation number in square brackets, for
-example~\cite{Authors14}.  Where appropriate, include the name(s) of
-editors of referenced books.
-
-\begin{table}
-\begin{center}
-\begin{tabular}{|l|c|}
-\hline
-Method & Frobnability \\
-\hline\hline
-Theirs & Frumpy \\
-Yours & Frobbly \\
-Ours & Makes one's heart Frob\\
-\hline
-\end{tabular}
-\end{center}
-\caption{Results. Ours is better.}
-\label{mytable}
-\end{table}
 
 %-------------------------------------------------------------------------
 \subsection{Illustrations, graphs, and photographs}
 
-All graphics should be centered.  Please ensure that any point you wish to
-make is resolvable in a printed copy of the paper.  Resize fonts in figures
-to match the font in the body text, and choose line widths which render
-effectively in print.  Many readers (and reviewers), even of an electronic
-copy, will choose to print your paper in order to read it.  You cannot
-insist that they do otherwise, and therefore must not assume that they can
-zoom in to see tiny details on a graphic.
-
-When placing figures in \LaTeX, it's almost always best to use
-\verb+\includegraphics+, and to specify the  figure width as a multiple of
-the line width as in the example below
 {\small\begin{verbatim}
    \usepackage[dvips]{graphicx} ...
    \includegraphics[width=0.8\linewidth]
