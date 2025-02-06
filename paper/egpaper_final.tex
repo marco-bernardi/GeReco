@@ -85,7 +85,7 @@ The ML pipeline of this is composed by two models working together:
 \begin{itemize}
    \item \textbf{Palm detector}: operates on a full input image and locates palms via an oriented hand bounding box. The advantage of detecting the palm instead of the hand 
    is that it is a more rigid structure and it is easier to detect. The feature extraction is done via an encoder-decoder architecture. The idea is to make a recall to the 
-   \textit{Feature pyramid networks}:
+   \textit{Feature pyramid networks} \cite{lin2017featurepyramidnetworksobject}:
    \begin{enumerate}
       \item \textit{Bottom-up pathway}: a ConvNet generates feature maps at multiple scales. The deeper layers contain more rich semantic information;
       \item \textit{Top-down pathway}: Upsample the feature maps and merge them with the corresponding feature maps through lateral connections (from the bottom-up pathway).
@@ -96,43 +96,71 @@ The ML pipeline of this is composed by two models working together:
    the indication if the hand is left or right.
 \end{itemize}
 We did transfer learning on this model by training only the last layer of the model such that the model can learn to classify the gestures we needed.
-For the fine-tuning of the model we modified the sequent hyperparameters, it's reported the best configuration we found:
-\begin{itemize}
-   \item learning\_rate = 0.0002;
-   \item lr\_decay = 0.99 - Learning rate decay to use for gradient descent training;
-   \item epohcs = 30;
-   \item shuffle = True - True if the dataset is shuffled before training, this is done in order to avoid the model to have some bias;
-   \item batch\_size = 128 - trade-off between speed and accuracy. It helped us also in reducing the overfitting;
-   \item dropout\_rate = 0.1 - The fraction of the input units to drop, this is used to avoid overfitting;
-   \item layer\_widths = [1024, 512, 256, 128, 64] - A list of hidden layer widths for the gesture model. Each element in the list will 
-   create a new hidden layer with the specified width.
-\end{itemize}
+For the fine-tuning of the model we tuned the \textit{learning rate} and its \textit{decay}, 
+the \textit{batch size}, and the \textit{layer widths} in order to find a trade-off between 
+efficiency and accuracy.
+We \textit{shuffled} the dataset before training in order to avoid the model to have some bias.
+In order to reduce the overfitting we used the \textit{dropout} technique to 
+let the model learn different representations of the same data by setting a random fraction of 
+the units of the network to 0 at each update during training time.
 \subsection{Dynamic gestures}
 \subsubsection{Data preprocessing}
+\label{subsec:datapreprocessing}
+- denoising
 - 10 frames crop hand
 - sharpening
 - 10 frames on BODY
+- for the ixed size lstm
 \subsubsection{Model}
--Mediapipe
--InceptionV3
--LSTM: accept fixed size
+The pipeline is similar to the one explained in \cite{electronics13163233}, it is composed by three main parts:
+\begin{enumerate}
+   \item \textbf{MediaPipe}: MediaPipe is used to crop the region of interest from each frame of the video.
+   As said in the previous section \ref{subsec:datapreprocessing} we have tried to train the model considering 
+   different regions of interest. We tried to crop the hand and the body of the person in the video.
+   \item \textbf{InceptionV3}: we used the InceptionV3 model \cite{szegedy2015rethinkinginceptionarchitecturecomputer} 
+   to extract features from the cropped regions of interest.
+   The idea of Inception is to have filters with different sizes in the same layer and then concatenate 
+   the results. What is trying to solve InceptionV3 with respect to the previous versions are:
+   \begin{itemize}
+      \item \textit{Reducing the representational bottleneck}: neural networks perform better when convolutions
+      didn't alter the dimension of the input drastically, there could be a loss of information;
+      \item \textit{Using smart factorization network}
+   \end{itemize}  
+   These problems are solved by \textit{factorizing filters} (e.g. 5x5 in two of 3x3) and by \textit{expanding 
+   the banks of filter in a wider way} instead of having deeper networks. 
+   Deeper models means higher reduction and hence loss of information.
+   \item \textbf{LSTM}: we used a LSTM layer to classify the gestures. 
+   The LSTM is a type of RNN, this means that can take in input a sequence of data. This is useful in our case
+   because we are trying to classify a sequence of frames. In the simple RNN there is an internal memory 
+   that allows to remember the previous results and the computation of the current input depends on 
+   the previous one. The problem with the simple RNN is that it has a problem with the \textit{vanishing gradient}.
+   LSTM solves this problem by introducing different components which allows to keep the information 
+   for a longer time (forget gate, input gate, output gate).
+\end{enumerate}
+The only model we trained on here is the LSTM model. The main problem we found during the training 
+was the overfitting. We tried to solve this problem by using:
+\begin{itemize}
+   \item \textit{Dropout}: it works by setting a random fraction of the units of the network to 0 
+   at each update during training time. This reduces the overfitting 
+   because the network is forced to learn different representations of the same data;
+   \item \textit{L2 regularization}: it works by adding a penalty to the loss function;
+   \item \textit{early stopping}: it works by stopping the training when the validation loss 
+   has no improvement for a certain number of epochs. We set the number of \textit{epochs} to 
+   300 and for our purposes there were too many since it overfitted after fewer epochs.
+\end{itemize}
+We also found here a trade-off between efficiency and accuracy by tuninig 
+the \textit{batch size} and the \textit{learning rate}.
+
+
+
+
+
 \subsection{Real time gesture recognition}
 
 \section{Experiments}
 (20\%, 25\%, 30\%, 35\%, 40\%, 100\%)
 
 \section{Conclusion}
-
-
-
-\begin{itemize}
-	\item Introduction (10\%): describe the problem you are working on, why it's important, and an overview of your results.
-	\item Related Work (10\%): discuss published work or similar apps that relates to your project. How is your approach similar or different from others?
-	\item Dataset (15\%): describe the data you are working with for your project. What type of data is it? Where did it come from? How much data are you working with? Did you have to do any preprocessing, filtering, etc., and why?
-	\item Method (30\%): discuss your approach for solving the problems that you set up in the introduction. Why is your approach the right thing to do? Did you consider alternative approaches? It may be helpful to include figures, diagrams, or tables to describe your method or compare it with others.
-	\item Experiments (30\%): discuss the experiments that you performed. The exact experiments will vary depending on the project, but you might compare with prior work, perform an ablation study to determine the impact of various components of your system, experiment with different hyperparameters or architectural choices. You should include graphs, tables, or other figures to illustrate your experimental results.
-	\item Conclusion (5\%): summarize your key results; what have you learned? Suggest ideas for future extensions.
-\end{itemize}	
 
 
 
