@@ -12,3 +12,5 @@ preprocessed_data.pkl
 *.pdf
 
 .DS_Store
+
+.tflite
