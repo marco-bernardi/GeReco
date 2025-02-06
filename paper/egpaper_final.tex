@@ -95,7 +95,7 @@ The ML pipeline of this is composed by two models working together:
    The model makes a regression to estimate the coordinates of the 21 hand's landmarks. It will return also the probability of the presence of the hand and 
    the indication if the hand is left or right.
 \end{itemize}
-We did transfer learning on this model by training only the last layer of the model such that the model can learn to classify the gestures we needed.
+We did transfer learning on this model by training only the last layer such that it can learn to classify the gestures we needed.
 For the fine-tuning of the model we tuned the \textit{learning rate} and its \textit{decay}, 
 the \textit{batch size}, and the \textit{layer widths} in order to find a trade-off between 
 efficiency and accuracy.
@@ -106,11 +106,10 @@ the units of the network to 0 at each update during training time.
 \subsection{Dynamic gestures}
 \subsubsection{Data preprocessing}
 \label{subsec:datapreprocessing}
-- denoising
 - 10 frames crop hand
-- sharpening
 - 10 frames on BODY
-- for the ixed size lstm
+- transformations to improve the quality of the images
+- for the fixed size lstm
 \subsubsection{Model}
 The pipeline is similar to the one explained in \cite{electronics13163233}, it is composed by three main parts:
 \begin{enumerate}
@@ -158,8 +157,34 @@ the \textit{batch size} and the \textit{learning rate}.
 \subsection{Real time gesture recognition}
 
 \section{Experiments}
-(20\%, 25\%, 30\%, 35\%, 40\%, 100\%)
-
+\subsection{Static gestures}
+In the following table \ref{tab:staticGestures} we can see the results of the model 
+trained on the static gestures dataset. 
+The tests are splitted based on the percentage of the augmented dataset with reference to number of the examples.
+\begin{table}[h]
+   \begin{center}
+   \begin{tabular}{|c|c|c|c|c|}
+   \hline
+   \textbf{Aug. \%} & \textbf{Val\_loss} & \textbf{Val\_Acc.} & \textbf{Test\_loss} & \textbf{Test\_Acc.}\\
+   \hline\hline
+   20 & 0.13 & 0.90 & 0.17 & 0.87 \\
+   \textbf{25} & 0.16 & 0.89 & \textbf{0.13} & \textbf{0.90} \\
+   30 & 0.19 & 0.86 & 0.19 & 0.87 \\
+   35 & 0.16 & 0.88 & 0.19 & 0.88 \\
+   40 & 0.18 & 0.86 & 0.17 & 0.87 \\
+   100 & 0.22 & 0.84 & 0.19 & 0.87 \\ 
+   \hline
+   \end{tabular}
+   \end{center}
+   \caption{Results of the model trained on the static gestures dataset.}
+   \label{tab:staticGestures}
+\end{table} \\
+We can say that the best results for the test accuracy are obtained with the 25\% of the 
+augmented dataset. An augmentation of the 25\% intrduces enough variability in the dataset in order to 
+improve the robustness of the model, but not too much to make data too different from the original one.
+At lower percentages the model could not have seen enough variations in the data to generalize well, and at 
+higher percentages the model could have seen too many variations making the learning less effective.
+\subsection{Dynamic gestures}
 \section{Conclusion}
 
 
