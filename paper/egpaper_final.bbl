@@ -13,11 +13,21 @@ Sindhusha Jeeru, Arun~Kumar Sivapuram, David~González León, Jade Gröli,
 \newblock Depth camera based dataset of hand gestures.
 \newblock {\em Data in Brief}, 45:108659, 2022.
 
+\bibitem{lin2017featurepyramidnetworksobject}
+Tsung-Yi Lin, Piotr Dollár, Ross Girshick, Kaiming He, Bharath Hariharan, and
+  Serge Belongie.
+\newblock Feature pyramid networks for object detection, 2017.
+
 \bibitem{lugaresi2019mediapipeframeworkbuildingperception}
 Camillo Lugaresi, Jiuqiang Tang, Hadon Nash, Chris McClanahan, Esha Uboweja,
   Michael Hays, Fan Zhang, Chuo-Ling Chang, Ming~Guang Yong, Juhyun Lee,
   Wan-Teh Chang, Wei Hua, Manfred Georg, and Matthias Grundmann.
 \newblock Mediapipe: A framework for building perception pipelines, 2019.
+
+\bibitem{szegedy2015rethinkinginceptionarchitecturecomputer}
+Christian Szegedy, Vincent Vanhoucke, Sergey Ioffe, Jonathon Shlens, and
+  Zbigniew Wojna.
+\newblock Rethinking the inception architecture for computer vision, 2015.
 
 \bibitem{electronics13163233}
 Yaseen, Oh-Jin Kwon, Jaeho Kim, Sonain Jamil, Jinhee Lee, and Faiz Ullah.
