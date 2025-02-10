@@ -102,10 +102,39 @@ the units of the network to 0 at each update during training time.
 \subsection{Dynamic gestures}
 \subsubsection{Data preprocessing}
 \label{subsec:datapreprocessing}
-- 10 frames crop hand
-- 10 frames on BODY
-- transformations to improve the quality of the images
-- for the fixed size lstm
+The data preprocessing for the dynamic gestures was more complex than the one for the static gestures. As seen in the 
+paper \cite{electronics13163233} the idea was to take 10 frames from the video equispaced and to crop the 
+\textbf{region of interest (ROI) on the hands} in order to not consider useless information of the background.
+After this the image should be resized to a 50x60, but InceptionV3 requires a minimum size 
+of 75x75, so we decided to use those dimensions.
+We noticed different things that were not considered, starting from the fact that there was no transformation 
+to improve the quality of the images. After cropping and resizing the images the quality was 
+not good enough to be used for the training. We decided to apply some transformations and the results is the 
+one which is presented in the image \ref{fig:transformation_hands}.
+We also flipped the images on the vertical axis in a way to recognize the gestures done by both hands.
+The idea to consider as ROI only the hands was not the best one for us, because in the dataset, the gestures 
+were done with the whole arm and not only with the hands. Furthermore, not in all images mediapipe is able to 
+recognize hands and so frames are dropped, but vectors of the same size are required by the lstm. In this way
+there was a big reduction of the whole dataset.
+To solve these problems we tried to train the model by \textbf{cropping the images on the body} of the person 
+as in the image \ref{fig:transformation_body}.
+We tried to use the \textbf{full image} without cropping but with the full image the model was not able to learn, probably 
+because the person was too far from the camera and the background was the biggest part of the image.
+The last try was to \textbf{crop directly on the arms} detected by mediapipe....
+-palo o chiattone
+
+\begin{figure*}[h]
+   \centering
+   \includegraphics[width=\textwidth]{images/transformation_hands.jpg} 
+   \caption{Transformations on ROI of the hands.}
+   \label{fig:transformation_hands}
+\end{figure*}
+\begin{figure*}[h]
+   \centering
+   \includegraphics[width=\textwidth]{images/transformation_body.jpg} 
+   \caption{Transformations on ROI of the body.}
+   \label{fig:transformation_body}
+\end{figure*}
 \subsubsection{Model}
 The pipeline is similar to the one explained by Yaseen et al \cite{electronics13163233}, it is composed by three main parts:
 \begin{enumerate}
@@ -181,23 +210,16 @@ improve the robustness of the model, but not too much to make data too different
 At lower percentages the model could not have seen enough variations in the data to generalize well, and at 
 higher percentages the model could have seen too many variations making the learning less effective.
 \subsection{Dynamic gestures}
-\section{Conclusion}
-
-
-
-
-
-
-%-------------------------------------------------------------------------
-\subsection{Illustrations, graphs, and photographs}
-
-{\small\begin{verbatim}
-   \usepackage[dvips]{graphicx} ...
-   \includegraphics[width=0.8\linewidth]
-                   {myfile.eps}
-\end{verbatim}
-}
-
+\section{Conclusion and future works}
+In this project we focused more on the modification of the dataset to recover frames lost during the preprocessing
+instead of finding a way to choose other frames, so this is a possible work to do to improve the model.
+We can say that with more resources we could get better results in less time, specially for the dynamic gestures:
+\begin{itemize}
+   \item \textbf{Camera} for the real time recognition;
+   \item \textbf{GPU} for the training of the models;
+   \item \textbf{Memory} to store more data and process all the frames of the videos.
+\end{itemize}
+results....
 
 {\small
 \bibliographystyle{ieee_fullname}

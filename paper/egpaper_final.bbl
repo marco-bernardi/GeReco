@@ -1,34 +1,43 @@
 \begin{thebibliography}{1}\itemsep=-1pt
 
 \bibitem{Alexander_2024}
-Kapitanov Alexander, Kvanchiani Karina, Nagaev Alexander, Kraynov Roman, and Makhliarchuk Andrei.
+Kapitanov Alexander, Kvanchiani Karina, Nagaev Alexander, Kraynov Roman, and
+  Makhliarchuk Andrei.
 \newblock Hagrid – hand gesture recognition image dataset.
-\newblock In {\em 2024 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)}. IEEE, Jan. 2024.
+\newblock In {\em 2024 IEEE/CVF Winter Conference on Applications of Computer
+  Vision (WACV)}. IEEE, Jan. 2024.
 
 \bibitem{JEERU2022108659}
-Sindhusha Jeeru, Arun~Kumar Sivapuram, David~González León, Jade Gröli, Sreenivasa~Reddy Yeduri, and Linga~Reddy Cenkeramaddi.
+Sindhusha Jeeru, Arun~Kumar Sivapuram, David~González León, Jade Gröli,
+  Sreenivasa~Reddy Yeduri, and Linga~Reddy Cenkeramaddi.
 \newblock Depth camera based dataset of hand gestures.
 \newblock {\em Data in Brief}, 45:108659, 2022.
 
 \bibitem{lin2017featurepyramidnetworksobject}
-Tsung-Yi Lin, Piotr Dollár, Ross Girshick, Kaiming He, Bharath Hariharan, and Serge Belongie.
+Tsung-Yi Lin, Piotr Dollár, Ross Girshick, Kaiming He, Bharath Hariharan, and
+  Serge Belongie.
 \newblock Feature pyramid networks for object detection, 2017.
 
 \bibitem{lugaresi2019mediapipeframeworkbuildingperception}
-Camillo Lugaresi, Jiuqiang Tang, Hadon Nash, Chris McClanahan, Esha Uboweja, Michael Hays, Fan Zhang, Chuo-Ling Chang, Ming~Guang Yong, Juhyun Lee, Wan-Teh Chang, Wei Hua, Manfred Georg, and Matthias Grundmann.
+Camillo Lugaresi, Jiuqiang Tang, Hadon Nash, Chris McClanahan, Esha Uboweja,
+  Michael Hays, Fan Zhang, Chuo-Ling Chang, Ming~Guang Yong, Juhyun Lee,
+  Wan-Teh Chang, Wei Hua, Manfred Georg, and Matthias Grundmann.
 \newblock Mediapipe: A framework for building perception pipelines, 2019.
 
 \bibitem{szegedy2015rethinkinginceptionarchitecturecomputer}
-Christian Szegedy, Vincent Vanhoucke, Sergey Ioffe, Jonathon Shlens, and Zbigniew Wojna.
+Christian Szegedy, Vincent Vanhoucke, Sergey Ioffe, Jonathon Shlens, and
+  Zbigniew Wojna.
 \newblock Rethinking the inception architecture for computer vision, 2015.
 
 \bibitem{electronics13163233}
 Yaseen, Oh-Jin Kwon, Jaeho Kim, Sonain Jamil, Jinhee Lee, and Faiz Ullah.
-\newblock Next-gen dynamic hand gesture recognition: Mediapipe, inception-v3 and lstm-based enhanced deep learning model.
+\newblock Next-gen dynamic hand gesture recognition: Mediapipe, inception-v3
+  and lstm-based enhanced deep learning model.
 \newblock {\em Electronics}, 13(16), 2024.
 
 \bibitem{zhang2020mediapipehandsondevicerealtime}
-Fan Zhang, Valentin Bazarevsky, Andrey Vakunov, Andrei Tkachenka, George Sung, Chuo-Ling Chang, and Matthias Grundmann.
+Fan Zhang, Valentin Bazarevsky, Andrey Vakunov, Andrei Tkachenka, George Sung,
+  Chuo-Ling Chang, and Matthias Grundmann.
 \newblock Mediapipe hands: On-device real-time hand tracking, 2020.
 
 \end{thebibliography}
