@@ -55,7 +55,10 @@ The goal of this project is to study, implement and test some approaches to gest
 the hand while in the second one we recognize the movement. 
 We also tried to implement a real time gesture recognition system using a webcam and the developed models.
 \section{Related Work}
-There are many apporaches to gesture recognition. What we have done is to study some of them and try to implement or to use transfer learning to adapt them to our problem.
+There are many apporaches to gesture recognition. What we have done is to study some of them and try to implement or to use transfer learning to adapt them to our problem. \\
+MENZIONARE ALCUNI APPROCCI TROVATI IN ALTRI PAPER? AD ESEMPIO VISION TRANSFORMERS \\
+% PAPER -> https://iris.unimore.it/retrieve/handle/11380/1212263/282584/3DV_2020.pdf
+One of the approaches seen is try to fine-tune a \textit{Vision Transformer (ViT)} in order to recognize dynamic gestures. \\
 Finally we decided to use the \textit{MediaPipe Hands} \cite{zhang2020mediapipehandsondevicerealtime}, developed through Mediapipe \cite{lugaresi2019mediapipeframeworkbuildingperception} 
 to detect static gesture and a custom model to detect dynamic gestures similar to the one proposed by Yaseen et al. \cite{electronics13163233}, that consists on three layers: \textit{Mediapipe}, \textit{InceptionV3} and \textit{LSTM}.
 
@@ -72,8 +75,7 @@ Clearly the dataset is a crucial part of the project and obviously we needed two
 Mediapipe provides a good solution for hand detection and tracking. We used it to detect the hand classify the gestures.
 The complex part here was to understand how to improve the accuracy of the model and we made it by using transfer learning, data augmentation and hyperparameters tuning.
 \subsubsection{Data preprocessing}
-For image processing it was important to choose those transformations that did not have the risk of cutting off the hands. We decided to use: rotation, scaling, 
-brightness-contrast, color conversion, blur, noise, sharpening. All this transformations were applied with random parameters.
+For image processing it was important to choose those transformations that did not have the risk of cutting off the hands. We decided to use: \textit{rotation}, \textit{scaling}, \textit{brightness-contrast}, \textit{color conversion}, \textit{blur}, \textit{noise} and \textit{sharpening}. All these transformations were applied with random parameters.
 We tried different percentages in addition to the initial dataset and the one which gave us the best results was 25\%.  
 \subsubsection{Model}
 Mediapipe is a framework for building pipelines to perform infernce over arbitrary sensory data. This has been used to develop a model that can detect the hand and classify the gesture.
@@ -114,13 +116,12 @@ one which is presented in the image \ref{fig:transformation_hands}.
 We also flipped the images on the vertical axis in a way to recognize the gestures done by both hands.
 The idea to consider as ROI only the hands was not the best one for us, because in the dataset, the gestures 
 were done with the whole arm and not only with the hands. Furthermore, not in all images mediapipe is able to 
-recognize hands and so frames are dropped, but vectors of the same size are required by the lstm. In this way
-there was a big reduction of the whole dataset.
+recognize hands and so frames are dropped, but vectors of the same size are required by the \textit{LSTM}. In this way there was a big reduction of the whole dataset.
 To solve these problems we tried to train the model by \textbf{cropping the images on the body} of the person 
 as in the image \ref{fig:transformation_body}.
 We tried to use the \textbf{full image} without cropping but with the full image the model was not able to learn, probably 
 because the person was too far from the camera and the background was the biggest part of the image.
-The last try was to \textbf{crop directly on the arms} detected by mediapipe....
+The last try was to \textbf{crop directly on the arms} detected by mediapipe, specifying the ROI: considering the \href{https://ai.google.dev/static/mediapipe/images/solutions/pose_landmarks_index.png}{keypoints of the pose detected by mediapipe}, we have selected the ROI covered by the keypoints from 11 to 22. WAITING THE RESULTS\dots
 -palo o chiattone
 
 \begin{figure*}[h]
@@ -138,7 +139,7 @@ The last try was to \textbf{crop directly on the arms} detected by mediapipe....
 \subsubsection{Model}
 The pipeline is similar to the one explained by Yaseen et al \cite{electronics13163233}, it is composed by three main parts:
 \begin{enumerate}
-   \item \textbf{MediaPipe}: MediaPipe is used to crop the region of interest from each frame of the video.
+   \item \textbf{MediaPipe}: MediaPipe is used to detect and then crop the ROI from each frame of the video.
    As said in the previous section \ref{subsec:datapreprocessing} we have tried to train the model considering 
    different regions of interest. We tried to crop the hand and the body of the person in the video. 
    \item \textbf{InceptionV3}: we used the InceptionV3 model \cite{szegedy2015rethinkinginceptionarchitecturecomputer} 
@@ -166,7 +167,7 @@ was the overfitting. We tried to solve this problem by using:
 \begin{itemize}
    \item \textit{Dropout}: it works by setting a random fraction of the units of the network to 0 
    at each update during training time. This reduces the overfitting 
-   because the network is forced to learn different representations of the same data;
+   because the network is forced to learn different representations of the same data; ??????????
    \item \textit{L2 regularization}: it works by adding a penalty to the loss function;
    \item \textit{early stopping}: it works by stopping the training when the validation loss 
    has no improvement for a certain number of epochs. We set the number of \textit{epochs} to 
@@ -205,7 +206,7 @@ The tests are splitted based on the percentage of the augmented dataset with ref
    \label{tab:staticGestures}
 \end{table} \\
 We can say that the best results for the test accuracy are obtained with the 25\% of the 
-augmented dataset. An augmentation of the 25\% intrduces enough variability in the dataset in order to 
+augmented dataset, intrducing enough variability in the dataset in order to 
 improve the robustness of the model, but not too much to make data too different from the original one.
 At lower percentages the model could not have seen enough variations in the data to generalize well, and at 
 higher percentages the model could have seen too many variations making the learning less effective.
