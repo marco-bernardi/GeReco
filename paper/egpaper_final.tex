@@ -56,17 +56,13 @@ the hand while in the second one we recognize the movement.
 We also tried to implement a real time gesture recognition system using a webcam and the developed models.
 \section{Related Work}
 There are many apporaches to gesture recognition. What we have done is to study some of them and try to implement or to use transfer learning to adapt them to our problem.
-Finally we decided to use the MediaPipe Hands \cite{zhang2020mediapipehandsondevicerealtime}, developed through Mediapipe \cite{lugaresi2019mediapipeframeworkbuildingperception} 
-to detect static gesture and a custom model to detect dynamic gestures similar to that one shown in this paper \cite{electronics13163233}. 
-This last model is based on Mediapipe, InceptionV3 and a LSTM layer.
+Finally we decided to use the \textit{MediaPipe Hands} \cite{zhang2020mediapipehandsondevicerealtime}, developed through Mediapipe \cite{lugaresi2019mediapipeframeworkbuildingperception} 
+to detect static gesture and a custom model to detect dynamic gestures similar to the one proposed by Yaseen et al. \cite{electronics13163233}, that consists on three layers: \textit{Mediapipe}, \textit{InceptionV3} and \textit{LSTM}.
 
 \section{Dataset}
-Clearly the dataset is a crucial part of the project and obviously we needed two kind of dataset. For the static gestures 
-we used a dataset of images while for the dynamic gestures we used a dataset of videos:
+Clearly the dataset is a crucial part of the project and obviously we needed two kind of dataset:
 \begin{itemize}
-   \item Dataset of \textbf{static gestures}: we used a reduced version of the \textit{HaGRID dataset} \cite{Alexander_2024}. The original size dataset
-   is too big for our purposes and for our resources, so we decided to use a reduced version of it. The original dataset contains about 550000 FullHD images (716GB)
-   divided in 18 classes of gestures. We decided to use only about 2000 images divided in 6 classes of gestures.
+   \item Dataset of \textbf{static gestures}: we used a reduced version of the \textit{HaGRID dataset} \cite{Alexander_2024}. The original dataset is too big for our purposes and for our resources, it contains about 550000 Full-HD images (716GB) divided in 18 classes of gestures. So we decided to use only about 2000 images divided in 6 classes of gestures.
    \item Dataset of \textbf{dynamic gestures}: we used the \textit{Depth camera based dataset of hand gestures} \cite{JEERU2022108659}. In this case there are about 4000 videos of 
    6 different gestures.
 \end{itemize}
@@ -96,11 +92,11 @@ The ML pipeline of this is composed by two models working together:
    the indication if the hand is left or right.
 \end{itemize}
 We did transfer learning on this model by training only the last layer such that it can learn to classify the gestures we needed.
-For the fine-tuning of the model we tuned the \textit{learning rate} and its \textit{decay}, 
-the \textit{batch size}, and the \textit{layer widths} in order to find a trade-off between 
+For the fine-tuning of the model we tuned the \texttt{learning\_rate} and its \texttt{decay}, 
+the \texttt{batch\_size}, and the \texttt{layer\_widths} in order to find a trade-off between 
 efficiency and accuracy.
-We \textit{shuffled} the dataset before training in order to avoid the model to have some bias.
-In order to reduce the overfitting we used the \textit{dropout} technique to 
+We \texttt{shuffled} the dataset before training in order to avoid the model to have some bias.
+In order to reduce the overfitting we used the \texttt{dropout} technique to 
 let the model learn different representations of the same data by setting a random fraction of 
 the units of the network to 0 at each update during training time.
 \subsection{Dynamic gestures}
@@ -111,11 +107,11 @@ the units of the network to 0 at each update during training time.
 - transformations to improve the quality of the images
 - for the fixed size lstm
 \subsubsection{Model}
-The pipeline is similar to the one explained in \cite{electronics13163233}, it is composed by three main parts:
+The pipeline is similar to the one explained by Yaseen et al \cite{electronics13163233}, it is composed by three main parts:
 \begin{enumerate}
    \item \textbf{MediaPipe}: MediaPipe is used to crop the region of interest from each frame of the video.
    As said in the previous section \ref{subsec:datapreprocessing} we have tried to train the model considering 
-   different regions of interest. We tried to crop the hand and the body of the person in the video.
+   different regions of interest. We tried to crop the hand and the body of the person in the video. 
    \item \textbf{InceptionV3}: we used the InceptionV3 model \cite{szegedy2015rethinkinginceptionarchitecturecomputer} 
    to extract features from the cropped regions of interest.
    The idea of Inception is to have filters with different sizes in the same layer and then concatenate 
