@@ -56,9 +56,8 @@ the hand while in the second one we recognize the movement.
 We also tried to implement a real time gesture recognition system using a webcam and the developed models.
 \section{Related Work}
 There are many apporaches to gesture recognition. What we have done is to study some of them and try to implement or to use transfer learning to adapt them to our problem. \\
-MENZIONARE ALCUNI APPROCCI TROVATI IN ALTRI PAPER? AD ESEMPIO VISION TRANSFORMERS \\
 % PAPER -> https://iris.unimore.it/retrieve/handle/11380/1212263/282584/3DV_2020.pdf
-One of the approaches seen is try to fine-tune a \textit{Vision Transformer (ViT)} in order to recognize dynamic gestures. \\
+One of the approaches we explored in the literature was fine-tuning a \textit{Vision Transformer (ViT)} for dynamic gesture recognition. While ViTs have shown promising results in computer vision tasks, we did not pursue this approach due to its high computational requirements and the need for large-scale training data. \\
 Finally we decided to use the \textit{MediaPipe Hands} \cite{zhang2020mediapipehandsondevicerealtime}, developed through Mediapipe \cite{lugaresi2019mediapipeframeworkbuildingperception} 
 to detect static gesture and a custom model to detect dynamic gestures similar to the one proposed by Yaseen et al. \cite{electronics13163233}, that consists on three layers: \textit{Mediapipe}, \textit{InceptionV3} and \textit{LSTM}.
 
