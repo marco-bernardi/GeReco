@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex egpaper_final"] 1739263751 "egpaper_final.aux" "egpaper_final.bbl" "egpaper_final" 1739263771 0
+["bibtex egpaper_final"] 1739266362 "egpaper_final.aux" "egpaper_final.bbl" "egpaper_final" 1739266680 0
   "./egbib.bib" 1738913690 5546 d027486d4eef33aff4420c92c808f659 ""
   "./ieee_fullname.bst" 1738747496 19905 72b73f4cb1c51eaa1a7af8ecad2b6bfb ""
-  "egpaper_final.aux" 1739263771 4242 736450cfbb667d68cc163644cec1fa0b "pdflatex"
+  "egpaper_final.aux" 1739266680 4120 88670d8ea5ded899b339257f7c002a1e "pdflatex"
   (generated)
   "egpaper_final.bbl"
   "egpaper_final.blg"
   (rewritten before read)
-["pdflatex"] 1739263771 "/Users/sebastianosanson/Development/VCS_Project/GeReco/paper/egpaper_final.tex" "egpaper_final.pdf" "egpaper_final" 1739263771 0
-  "/Users/sebastianosanson/Development/VCS_Project/GeReco/paper/egpaper_final.tex" 1739263770 15066 55d80655bf62bcc184769b4a3c634afd ""
+["pdflatex"] 1739266679 "/Users/sebastianosanson/Development/VCS_Project/GeReco/paper/egpaper_final.tex" "egpaper_final.pdf" "egpaper_final" 1739266680 0
+  "/Users/sebastianosanson/Development/VCS_Project/GeReco/paper/egpaper_final.tex" 1739266679 14892 1522b90d6651f719ec08f9c25af5645b ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/tfm/adobe/courier/pcrr7t.tfm" 1136768653 960 379cc0019370a9e0208a0a3f949f847a ""
@@ -115,9 +115,9 @@
   "/usr/local/texlive/2023/texmf.cnf" 1678822455 577 1b2b1af17af2508fb20dd85783af4050 ""
   "cvpr.sty" 1738747496 8185 9c85e63bb1830fdefeac27370f229c9e ""
   "cvpr_eso.sty" 1738747496 3878 6aa7c08ff2621006e0603349e40a30a8 ""
-  "egpaper_final.aux" 1739263771 4242 736450cfbb667d68cc163644cec1fa0b "pdflatex"
-  "egpaper_final.bbl" 1739263751 1904 e300c8932401b70287fe24386cb64b50 "bibtex egpaper_final"
-  "egpaper_final.tex" 1739263770 15066 55d80655bf62bcc184769b4a3c634afd ""
+  "egpaper_final.aux" 1739266680 4120 88670d8ea5ded899b339257f7c002a1e "pdflatex"
+  "egpaper_final.bbl" 1739266362 1559 f06550718002268c8cb8e420bf7a2861 "bibtex egpaper_final"
+  "egpaper_final.tex" 1739266679 14892 1522b90d6651f719ec08f9c25af5645b ""
   "eso-pic.sty" 1738747496 9460 d2935ae95b5cd343fcf5887ff530288d ""
   "images/transformation_body.jpg" 1739205165 35587 9c1efa532dbc4d6dc15ff09674f889c1 ""
   "images/transformation_hands.jpg" 1739205165 171501 621bf1c01e4aaf6e2fbb2152e8b68ba7 ""

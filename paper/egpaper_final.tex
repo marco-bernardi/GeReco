@@ -55,11 +55,12 @@ The goal of this project is to study, implement and test some approaches to gest
 the hand while in the second one we recognize the movement. 
 We also tried to implement a real time gesture recognition system using a webcam and the developed models.
 \section{Related Work}
+
 There are many apporaches to gesture recognition. What we have done is to study some of them and try to implement or to use transfer learning to adapt them to our problem. \\
+For static gesture recognition, we utilized \textit{MediaPipe Hands} \cite{zhang2020mediapipehandsondevicerealtime}, a solution developed by Google. We adapted the model by fine-tuning it to accurately classify the specific gestures required for our application. \\
 % PAPER -> https://iris.unimore.it/retrieve/handle/11380/1212263/282584/3DV_2020.pdf
 One of the approaches we explored in the literature was fine-tuning a \textit{Vision Transformer (ViT)} for dynamic gesture recognition. While ViTs have shown promising results in computer vision tasks, we did not pursue this approach due to its high computational requirements and the need for large-scale training data. \\
-Finally we decided to use the \textit{MediaPipe Hands} \cite{zhang2020mediapipehandsondevicerealtime}, developed through Mediapipe \cite{lugaresi2019mediapipeframeworkbuildingperception} 
-to detect static gesture and a custom model to detect dynamic gestures similar to the one proposed by Yaseen et al. \cite{electronics13163233}, that consists on three layers: \textit{Mediapipe}, \textit{InceptionV3} and \textit{LSTM}.
+Finally we decided to implement a custom model to detect dynamic gestures similar to the one proposed by Yaseen et al.\cite{electronics13163233}, that consists on three layers: \textit{Mediapipe}, \textit{InceptionV3} and \textit{LSTM}.
 
 \section{Dataset}
 Clearly the dataset is a crucial part of the project and obviously we needed two kind of dataset:
@@ -164,9 +165,7 @@ The pipeline is similar to the one explained by Yaseen et al \cite{electronics13
 The only model we trained on here is the LSTM model. The main problem we found during the training 
 was the overfitting. We tried to solve this problem by using:
 \begin{itemize}
-   \item \textit{Dropout}: it works by setting a random fraction of the units of the network to 0 
-   at each update during training time. This reduces the overfitting 
-   because the network is forced to learn different representations of the same data; ??????????
+   \item \textit{Dropout}: it reduces the overfitting because the network is forced to learn different representations of the same data;
    \item \textit{L2 regularization}: it works by adding a penalty to the loss function;
    \item \textit{early stopping}: it works by stopping the training when the validation loss 
    has no improvement for a certain number of epochs. We set the number of \textit{epochs} to 
