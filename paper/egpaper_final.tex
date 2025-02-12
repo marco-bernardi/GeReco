@@ -110,38 +110,11 @@ the units of the network to 0 at each update during training time.
 \subsection{Dynamic gestures}
 \subsubsection{Data preprocessing}
 \label{subsec:datapreprocessing}
-The data preprocessing for the dynamic gestures was more complex than the one for the static gestures. As seen in the 
-paper \cite{electronics13163233} the idea was to take 10 frames from the video equispaced and to crop the 
-\textbf{region of interest (ROI) on the hands} in order to not consider useless information of the background.
+The data preprocessing for the dynamic gestures was more complex than the one for the static gestures. As seen in the paper \cite{electronics13163233} the idea was to take 10 frames from the video equispaced and to crop the \textbf{region of interest (ROI) on the hands} in order to not consider useless information of the background.
 After this the image should be resized to a 50x60, but InceptionV3 requires a minimum size 
 of 75x75, so we decided to use those dimensions.
-We noticed different things that were not considered, starting from the fact that there was no transformation 
-to improve the quality of the images. After cropping and resizing the images the quality was 
-not good enough to be used for the training. We decided to apply some transformations and the results is the 
-one which is presented in the image \ref{fig:transformation_hands}.
-We also flipped the images on the vertical axis in a way to recognize the gestures done by both hands.
-The idea to consider as ROI only the hands was not the best one for us, because in the dataset, the gestures 
-were done with the whole arm and not only with the hands. Furthermore, not in all images mediapipe is able to 
-recognize hands and so frames are dropped, but vectors of the same size are required by the \textit{LSTM}. In this way there was a big reduction of the whole dataset.
-To solve these problems we tried to train the model by \textbf{cropping the images on the body} of the person 
-as in the image \ref{fig:transformation_body}.
-We tried to use the \textbf{full image} without cropping but with the full image the model was not able to learn, probably 
-because the person was too far from the camera and the background was the biggest part of the image.
-The last try was to \textbf{crop directly on the arms} detected by mediapipe, specifying the ROI: considering the \href{https://ai.google.dev/static/mediapipe/images/solutions/pose_landmarks_index.png}{keypoints of the pose detected by mediapipe}, we have selected the ROI covered by the keypoints from 11 to 22. WAITING THE RESULTS\dots
--palo o chiattone
-
-\begin{figure*}[h]
-   \centering
-   \includegraphics[width=\textwidth]{images/transformation_hands.jpg} 
-   \caption{Transformations on ROI of the hands.}
-   \label{fig:transformation_hands}
-\end{figure*}
-\begin{figure*}[h]
-   \centering
-   \includegraphics[width=\textwidth]{images/transformation_body.jpg} 
-   \caption{Transformations on ROI of the body.}
-   \label{fig:transformation_body}
-\end{figure*}
+The idea to consider as ROI only the hands was not the best one for us, because in the dataset, the gestures were done with the whole arm and not only with the hands. Furthermore, not in all images mediapipe is able to recognize hands and so frames are dropped, but vectors of the same size are required by the \textit{LSTM}. In this way there was a big reduction of the whole dataset.
+To solve these problems we tried to train the model by \textbf{cropping the images on the body} of the person.
 \subsubsection{Model}
 The pipeline is similar to the one explained by Yaseen et al \cite{electronics13163233}, it is composed by three main parts:
 \begin{enumerate}
@@ -175,7 +148,8 @@ was the overfitting. We tried to solve this problem by using:
    \item \textit{L2 regularization}: it works by adding a penalty to the loss function;
    \item \textit{early stopping}: it works by stopping the training when the validation loss 
    has no improvement for a certain number of epochs. We set the number of \textit{epochs} to 
-   300 and for our purposes there were too many since it overfitted after fewer epochs.
+   300 and for our purposes there were too many since it overfitted after fewer epochs;
+   \item \textit{Batch normalization}: it works by normalizing the input of the layer in order to have normalized data with zero mean and unit variance.
 \end{itemize}
 We also found here a trade-off between efficiency and accuracy by tuninig 
 the \textit{batch size} and the \textit{learning rate}.
@@ -218,7 +192,8 @@ higher percentages the model could have seen too many variations making the lear
 The initial experiment aimed to replicate the behavior of the model proposed by Yaseen et al. \cite{electronics13163233}, using the same dataset split and hyperparameters.  
 The results showed that the performance metrics were similar to those obtained by the authors. However, despite achieving high test accuracy, the model failed to correctly classify gestures in a real-life test environment.  
 
-Our initial hypothesis was that cropping images around the hands might not be the optimal approach. By focusing solely on the hands, the model lost crucial contextual information related to the gesture, particularly the position of the arms and the movement of the body. To address this issue, we leveraged MediaPipe pose detection to refine the cropping strategy, using keypoints as regions of interest (ROI). However, this modification did not lead to significant improvements in classification performance.  
+Our initial hypothesis was that cropping images around the hands might not be the optimal approach. By focusing solely on the hands, the model lost crucial contextual information related to the gesture, particularly the position of the arms and the movement of the body.
+To address this issue, we leveraged MediaPipe pose detection to refine the cropping strategy, using keypoints as regions of interest (ROI). However, this modification did not lead to significant improvements in classification performance.  
 
 These findings suggest that the issue was not related to the cropping strategy.  
 
@@ -231,7 +206,6 @@ Ad that the dataset was not well splitted, we decided to manually split (instead
 \subsubsection{Results}
 Initially, we were able to replicate the results obtained by Yaseen et al. \cite{electronics13163233}
 as shown in Table \ref{tab:dynamicGesturesBad}, but only when using an incorrect dataset split.  
-This suggests that the original high accuracy was likely influenced by data leakage, where similar examples appeared in both the training and test sets. 
 \begin{table}[h]
    \begin{center}
    \begin{tabular}{|c|c|c|c|c|}
@@ -245,7 +219,9 @@ This suggests that the original high accuracy was likely influenced by data leak
    \end{center}
    \caption{Results of the model trained on the bad splitted dynamic gestures dataset.}
    \label{tab:dynamicGesturesBad}
-\end{table}
+\end{table} \\
+This suggests that the original high accuracy was likely influenced by data leakage, where similar examples appeared in both the training and test sets. 
+
 After manually restructuring the dataset to ensure a clear separation between training and test samples, we observed a significant drop in accuracy. 
 (see Table \ref{tab:dynamicGesturesWell}).
 However, this decline indicated a more realistic performance evaluation, revealing the model’s actual ability to generalize to unseen gestures.  
@@ -265,6 +241,7 @@ These findings emphasize the importance of a well-structured dataset split when 
    \caption{Results of the model trained on the well splitted dynamic gestures dataset.}
    \label{tab:dynamicGesturesWell}
 \end{table}
+A thing that we can say about the dataset based on the crop of the hands is that it was to small for the fact that mediapipe was not able to recognize the hands in all the frames of the videos, and the model could not have seen enough variations in the data to generalize well.
 
 
 \section{Conclusion and future works}
@@ -276,7 +253,6 @@ We can say that with more resources we could get better results in less time, sp
    \item \textbf{GPU} for the training of the models;
    \item \textbf{Memory} to store more data and process all the frames of the videos.
 \end{itemize}
-results....
 
 {\small
 \bibliographystyle{ieee_fullname}
