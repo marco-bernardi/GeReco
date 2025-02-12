@@ -31,3 +31,67 @@ Epoch 10/10
 
 Test Loss: 0.3317
 Test Accuracy: 0.9204
+
+# Data Hands crop, right dataset split 
+
+model = keras.models.Sequential()
+
+model.add(keras.layers.LSTM(2048,
+                            activation='tanh',
+                            recurrent_activation='sigmoid',
+                            dropout=0.5,
+                            recurrent_dropout=0.5,
+                            kernel_regularizer=keras.regularizers.l2(1e-4),
+                            input_shape=(X.shape[1], 2048)))
+
+# Aggiunta di Batch Normalization dopo LSTM
+model.add(keras.layers.BatchNormalization())
+
+model.add(keras.layers.Dense(512, activation='relu', kernel_regularizer=keras.regularizers.l2(1e-3)))
+
+# Aggiunta di Batch Normalization dopo Dense
+model.add(keras.layers.BatchNormalization())
+
+model.add(keras.layers.Dropout(0.5))
+
+model.add(keras.layers.Dense(6, activation='softmax'))
+
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=1e-5),
+    loss=keras.losses.CategoricalCrossentropy(),  # Use categorical crossentropy for multi-class classification
+    metrics=['accuracy']
+)
+
+early_stopping = keras.callbacks.EarlyStopping(
+    monitor='val_loss',
+    patience=20,  # Numero di epoche senza miglioramenti prima di fermarsi
+)
+
+history = model.fit(
+    X,
+    y,
+    epochs=300,
+    batch_size=64,
+    validation_split=0.1,
+    shuffle=True,
+    callbacks=[early_stopping]
+)
+
+Epoch 128/300
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 143ms/step - accuracy: 0.9156 - loss: 0.6274 - val_accuracy: 0.7544 - val_loss: 1.0415
+Epoch 129/300
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 138ms/step - accuracy: 0.9193 - loss: 0.6302 - val_accuracy: 0.7719 - val_loss: 1.0244
+Epoch 130/300
+16/16 ━━━━━━━━━━━━━━━━━━━━ 3s 138ms/step - accuracy: 0.9238 - loss: 0.6042 - val_accuracy: 0.7456 - val_loss: 1.0522
+Epoch 131/300
+16/16 ━━━━━━━━━━━━━━━━━━━━ 3s 144ms/step - accuracy: 0.9252 - loss: 0.5917 - val_accuracy: 0.7456 - val_loss: 1.0654
+Epoch 132/300
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 148ms/step - accuracy: 0.9278 - loss: 0.5974 - val_accuracy: 0.7544 - val_loss: 1.0670
+Epoch 133/300
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 141ms/step - accuracy: 0.9348 - loss: 0.5996 - val_accuracy: 0.7544 - val_loss: 1.0720
+Epoch 134/300
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 139ms/step - accuracy: 0.9295 - loss: 0.5878 - val_accuracy: 0.7544 - val_loss: 1.0716
+
+3/3 ━━━━━━━━━━━━━━━━━━━━ 0s 46ms/step - accuracy: 0.8490 - loss: 0.7567
+Test Loss: 0.8669
+Test Accuracy: 0.8152
