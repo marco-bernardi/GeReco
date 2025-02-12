@@ -2,22 +2,21 @@ import cv2 as cv
 import numpy as np
 import time
 import mediapipe as mp
+import argparse
 
-BaseOptions = mp.tasks.BaseOptions
-GestureRecognizer = mp.tasks.vision.GestureRecognizer
-GestureRecognizerOptions = mp.tasks.vision.GestureRecognizerOptions
-GestureRecognizerResult = mp.tasks.vision.GestureRecognizerResult
-VisionRunningMode = mp.tasks.vision.RunningMode
-
+# Global variables to store recognition results.
 recognized_gesture = ""
 landmark_list = []
 
-def gesture_recognition_callback(results: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
+def gesture_recognition_callback(results: mp.tasks.vision.GestureRecognizerResult,
+                                 output_image: mp.Image,
+                                 timestamp_ms: int):
+    """Callback function that processes gesture recognition results."""
     global recognized_gesture
     global landmark_list
 
     if results.gestures:
-        recognized_gesture =  ""
+        recognized_gesture = ""
         for gesture in results.gestures:
             recognized_gesture += f"{gesture[0].category_name} ({gesture[0].score:.2f}), "
     else:
@@ -26,18 +25,9 @@ def gesture_recognition_callback(results: GestureRecognizerResult, output_image:
     if results.hand_landmarks:
         landmark_list = results.hand_landmarks
 
-options = GestureRecognizerOptions(
-    base_options = BaseOptions(model_asset_path="/Users/sebastianosanson/Development/hgr-mp-lstm/dhgr-test/model/static_gesture_recognizer.task"),
-    running_mode = VisionRunningMode.LIVE_STREAM,
-    num_hands = 2,
-    result_callback = gesture_recognition_callback
-)
-
-mp_image = mp.Image
-mp_image_format = mp.ImageFormat
-
-def main():
-    cap_device = 0
+def main(args):
+    # Setup OpenCV capture.
+    cap_device = args.device
     cap_width = 960
     cap_height = 540
 
@@ -45,34 +35,52 @@ def main():
     cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
 
+    # Initialize Mediapipe drawing and hand modules.
     mp_drawing = mp.solutions.drawing_utils
     mp_drawing_styles = mp.solutions.drawing_styles
     mp_hands = mp.solutions.hands
 
-    hands =  mp_hands.Hands(
+    hands = mp_hands.Hands(
         model_complexity=0,
         min_detection_confidence=0.5,
         min_tracking_confidence=0.5,
         max_num_hands=2,
-    ) 
+    )
 
-    while cap.isOpened():
-        success, image = cap.read()
-        if not success:
-            print("Ignoring empty camera frame.")
-            continue
+    # Create the gesture recognizer options using the model path from the command line.
+    options = mp.tasks.vision.GestureRecognizerOptions(
+        base_options=mp.tasks.BaseOptions(model_asset_path=args.model),
+        running_mode=mp.tasks.vision.RunningMode.LIVE_STREAM,
+        num_hands=2,
+        result_callback=gesture_recognition_callback
+    )
 
-        with GestureRecognizer.create_from_options(options) as gesture_recognizer:
+    # Create the gesture recognizer outside the capture loop.
+    with mp.tasks.vision.GestureRecognizer.create_from_options(options) as gesture_recognizer:
+        while cap.isOpened():
+            success, image = cap.read()
+            if not success:
+                print("Ignoring empty camera frame.")
+                continue
+
+            # Record the start time for the current frame.
             start_time = time.time()
-            numpy_frame_from_opencv = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-            mp_image_object = mp_image(image_format = mp_image_format.SRGB, data = numpy_frame_from_opencv)
 
+            # Convert the frame to RGB as required by MediaPipe.
+            numpy_frame = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+            mp_image_object = mp.Image(
+                image_format=mp.ImageFormat.SRGB,
+                data=numpy_frame
+            )
+
+            # Compute a timestamp in milliseconds.
             frame_timestamp_ms = int((time.time() - start_time) * 1000)
 
-            gesture_recognizer.recognize_async(mp_image_object, timestamp_ms = frame_timestamp_ms)
+            # Send the frame to the gesture recognizer.
+            gesture_recognizer.recognize_async(mp_image_object, timestamp_ms=frame_timestamp_ms)
 
+            # Process hand landmarks using MediaPipe Hands.
             results = hands.process(image)
-
             if results.multi_hand_landmarks:
                 for hand_landmarks in results.multi_hand_landmarks:
                     mp_drawing.draw_landmarks(
@@ -82,40 +90,36 @@ def main():
                         mp_drawing_styles.get_default_hand_landmarks_style(),
                         mp_drawing_styles.get_default_hand_connections_style(),
                     )
-            
+
+            # Flip the image for a mirror view.
             image = cv.flip(image, 1)
-            
-            cv.putText(image, f"Gesture: {recognized_gesture}", (10, 700), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv.LINE_AA)
+
+            # Display the recognized gesture on the frame.
+            cv.putText(image, f"Gesture: {recognized_gesture}", (10, 700),
+                       cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv.LINE_AA)
+
             cv.imshow("Hand Gesture Recognition", image)
 
+            # Exit if the ESC key is pressed.
             if cv.waitKey(5) & 0xFF == 27:
                 break
-
-        # image.flags.writeable = False
-        # image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-        # results = hands.process(image)
-
-        # image.flags.writeable = True
-        # image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
-
-        # if results.multi_hand_landmarks:
-        #     for hand_landmarks in results.multi_hand_landmarks:
-        #         mp_drawing.draw_landmarks(
-        #             image,
-        #             hand_landmarks,
-        #             mp_hands.HAND_CONNECTIONS,
-        #             mp_drawing_styles.get_default_hand_landmarks_style(),
-        #             mp_drawing_styles.get_default_hand_connections_style(),
-        #         )
-
-        # image = cv.flip(image, 1)
-        # cv.imshow("Hand Gesture Recognition", image)
-
-        # if cv.waitKey(5) & 0xFF == 27:
-        #     break
 
     cap.release()
     cv.destroyAllWindows()
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Hand Gesture Recognition using MediaPipe.')
+    parser.add_argument(
+        '--model',
+        type=str,
+        default='static_gesture_recognizer.task',
+        help='Path to the gesture recognizer model file.'
+    )
+    parser.add_argument(
+        '--device',
+        type=int,
+        default=0,
+        help='OpenCV device for the webcam (default is 0).'
+    )
+    args = parser.parse_args()
+    main(args)
