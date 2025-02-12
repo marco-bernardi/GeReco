@@ -10,6 +10,10 @@ preprocessed_data.pkl
 *.out
 *.synctex.gz
 *.pdf
+*.bbl
+*.fdb_latexmk
+*.fls
+*.blg
 
 .DS_Store
 
