@@ -117,8 +117,18 @@ The idea to consider as ROI only the hands was not the best one for us, because 
 arm and not only with the hands. Furthermore, not in all images mediapipe is able to recognize hands and so frames are dropped, 
 but vectors of the same size are required by the \textit{LSTM}. In this way there was a big reduction of the whole dataset.
 To solve these problems we tried to train the model by cropping the \textbf{ROI on pose} instead of the hands, but again the results were not good, we had a lot of frames dropped and the model was not able to classify well the gestures. \\ 
-These two first techniques produce essentially an unbalanced dataset by dropping a lot of frames, furthermore we have encountered another problem, the subject in the sequence, after the cropping of the ROI and the resize of the frame, could appear stretched or squizzed, so we decided to try a third technique. \\
+These two first techniques produce essentially an unbalanced dataset by dropping a lot of frames, 
+furthermore we have encountered another problem, the subject in the sequence, 
+after the cropping of the ROI and the resize of the frame, could appear stretched or squized, and 
+also the hands may be cut off because the body's keypoint does not include all the fingers.
+An example can be seen in the figure \ref{fig:stretchedImage}.
 We tried to \textbf{not cropping the images}, but by simply removing some pixels from the margin in a way to have all the body of the person in the image and less background.
+\begin{figure}[h]
+   \centering
+   \includegraphics[width=1\linewidth]{images/stretched.jpg}
+   \caption{Example of stretched image after the cropping of the ROI.}
+   \label{fig:stretchedImage}
+\end{figure}
 \subsubsection{Model}
 The pipeline is similar to the one explained by Yaseen et al \cite{electronics13163233}, it is composed by three main parts:
 \begin{enumerate}
@@ -236,7 +246,7 @@ learning models, particularly in gesture recognition tasks.
    \textbf{Cropping} & \textbf{Val\_loss} & \textbf{Val\_Acc.} & \textbf{Test\_loss} & \textbf{Test\_Acc.}\\
    \hline\hline
    Hands & 2.05 & 0.63 & 1.69 & 0.76 \\
-   No crop & 0.69 & 0.91 & 1.95 & 0.53 \\
+   No crop & 0.93 & 0.74 & 1.46 & 0.73 \\
    \hline
    \end{tabular}
    \end{center}
@@ -265,8 +275,8 @@ able again to classify well all the types of gestures.
    \label{fig:noCropConfusionMatrix}
 \end{figure} \\
 In the confusion matrix presented \ref{fig:noCropConfusionMatrix} we can clearly see 
-that examples are not dropped and some gestures are classified better than others like the zoom-out 
-or the scroll-left. In a real time recognition system this second model worked better than the 
+that examples are not dropped and the only not well recognized class is the \textit{zoom in}.
+In a real time recognition system this second model worked better than the 
 first one, but the accuracy was still too low to be used in a real application.
 
 \section{Conclusion and future works}
@@ -280,6 +290,9 @@ specially for the dynamic gestures:
    \item \textbf{GPU} for the training of the models;
    \item \textbf{Memory} to store more data and process all the frames of the videos.
 \end{itemize}
+Another possible work to do is to try to combine the prediction of the keypoints of the hands
+with the prediction of the keypoints of the body in order to have a better cropped images in the 
+preprocessing phase. 
 The model for the static gesture recognition worked well and thanks to the transfer learning 
 we were able to get good results in a short time. The model for the dynamic gesture recognition
 was more complex, it has been necessary a deep study on the dataset and the preprocessing and a lot of time 
