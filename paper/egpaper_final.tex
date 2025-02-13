@@ -58,7 +58,7 @@ We also tried to implement a real time gesture recognition system using a webcam
 There are many approaches to gesture recognition. Our goal was to study some of them and explore their implementation, either directly or through transfer learning, to adapt them to our problem.  
 For static gesture recognition, we utilized \textit{MediaPipe Hands} \cite{zhang2020mediapipehandsondevicerealtime}, a solution developed by Google. We adapted the model by fine-tuning it to accurately classify the specific gestures required for our application.  
 % PAPER -> https://iris.unimore.it/retrieve/handle/11380/1212263/282584/3DV_2020.pdf  
-One of the approaches we explored in the literature was fine-tuning a \textit{Vision Transformer (ViT)} for dynamic gesture recognition. While ViTs have shown promising results in computer vision tasks, we ultimately did not pursue this approach due to its high computational requirements and the need for large-scale training data.  
+For dynamic gestures recognition, one of the approaches we explored in the literature was fine-tuning a \textit{Vision Transformer (ViT)}. While ViTs have shown promising results in computer vision tasks, we ultimately did not pursue this approach due to its high computational requirements and the need for large-scale training data.  
 Finally, we decided to implement a custom model for dynamic gesture recognition, similar to the one proposed by Yaseen et al. \cite{electronics13163233}. This model consists of three main components: \textit{MediaPipe}, \textit{InceptionV3}, and \textit{LSTM}.  
 
 \section{Dataset}  
@@ -70,8 +70,8 @@ The dataset is a crucial component of this project. We required two types of dat
    Therefore, we selected a subset of about 2,000 images, distributed across 6 gesture classes.  
 
    \item \textbf{Dataset of dynamic gestures}: We used the \textit{Depth Camera-Based Dataset of Hand Gestures} \cite{JEERU2022108659}.  
-   This dataset contains both RGB and depth video frames of various hand movements, including scroll-right/left, scroll-up/down, and zoom-in/out. Each sequence consists of 40 frames, with a total of 662 sequences.  
-   For our approach, we used only the RGB frames. To comply with the authors’ instructions, we selected 10 frames from each sequence, sampling one every 4 frames from the original 40-frame sequence.  
+   This dataset contains both RGB and depth video frames of various hand movements, including scroll-right/left, scroll-up/down, and zoom-in/out. Each sequence consists of 40 frames, with a total of about 700 sequences.  
+   For our approach, we used only the RGB frames. To comply with the authors’ instructions, we selected 10 frames from each sequence, sampling one every 4 frames from the original 40-frames sequence.  
 \end{itemize}  
 
 
@@ -84,7 +84,7 @@ The complex part here was to understand how to improve the accuracy of the model
 For image processing it was important to choose those transformations that did not have the risk of cutting off the hands. We decided to use: \textit{rotation}, \textit{scaling}, \textit{brightness-contrast}, \textit{color conversion}, \textit{blur}, \textit{noise} and \textit{sharpening}. All these transformations were applied with random parameters.
 We tried different percentages in addition to the initial dataset and the one which gave us the best results was 25\%.  
 \subsubsection{Model}
-Mediapipe is a framework for building pipelines to perform infernce over arbitrary sensory data. This has been used to develop a model that can detect the hand and classify the gesture.
+Mediapipe is a framework for building pipelines to perform inference over arbitrary sensory data. This has been used to develop a model that can detect the hand and classify the gesture.
 The ML pipeline of this is composed by two models working together:
 \begin{itemize}
    \item \textbf{Palm detector}: operates on a full input image and locates palms via an oriented hand bounding box. The advantage of detecting the palm instead of the hand 
@@ -110,14 +110,15 @@ the units of the network to 0 at each update during training time.
 \subsection{Dynamic gestures}
 \subsubsection{Data preprocessing}
 \label{subsec:datapreprocessing}
-The data preprocessing for the dynamic gestures was more complex than the one for the static gestures. As seen in the paper \cite{electronics13163233} the idea was to take 10 frames from the video equispaced and to crop the \textbf{region of interest (ROI) on the hands} in order to not consider useless information of the background.
+The data preprocessing for the dynamic gestures was more complex than the one for the static gestures. As seen in the paper \cite{electronics13163233} the idea was to take 10 frames, from the video, equispaced and to crop the \textbf{region of interest (ROI) on the hands} in order to not consider useless information of the background.
 After this the image should be resized to a 50x60, but InceptionV3 requires a minimum size 
 of 75x75, so we decided to use those dimensions.
 The idea to consider as ROI only the hands was not the best one for us, because in the dataset, the gestures were done with the whole 
 arm and not only with the hands. Furthermore, not in all images mediapipe is able to recognize hands and so frames are dropped, 
 but vectors of the same size are required by the \textit{LSTM}. In this way there was a big reduction of the whole dataset.
-To solve these problems we tried to train the model by \textbf{not cropping the images}, but by simply removing some pixels from the margin in a way
-to have all the body of the person in the image and less background.
+To solve these problems we tried to train the model by cropping the \textbf{ROI on pose} instead of the hands, but again the results were not good, we had a lot of frames dropped and the model was not able to classify well the gestures. \\ 
+These two first techniques produce essentially an unbalanced dataset by dropping a lot of frames, furthermore we have encountered another problem, the subject in the sequence, after the cropping of the ROI and the resize of the frame, could appear stretched or squizzed, so we decided to try a third technique. \\
+We tried to \textbf{not cropping the images}, but by simply removing some pixels from the margin in a way to have all the body of the person in the image and less background.
 \subsubsection{Model}
 The pipeline is similar to the one explained by Yaseen et al \cite{electronics13163233}, it is composed by three main parts:
 \begin{enumerate}
