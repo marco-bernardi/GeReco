@@ -4,7 +4,6 @@ import time
 import mediapipe as mp
 import argparse
 
-# Global variables to store recognition results.
 recognized_gesture = ""
 landmark_list = []
 
@@ -26,7 +25,6 @@ def gesture_recognition_callback(results: mp.tasks.vision.GestureRecognizerResul
         landmark_list = results.hand_landmarks
 
 def main(args):
-    # Setup OpenCV capture.
     cap_device = args.device
     cap_width = 960
     cap_height = 540
@@ -35,7 +33,6 @@ def main(args):
     cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
 
-    # Initialize Mediapipe drawing and hand modules.
     mp_drawing = mp.solutions.drawing_utils
     mp_drawing_styles = mp.solutions.drawing_styles
     mp_hands = mp.solutions.hands
@@ -47,7 +44,6 @@ def main(args):
         max_num_hands=2,
     )
 
-    # Create the gesture recognizer options using the model path from the command line.
     options = mp.tasks.vision.GestureRecognizerOptions(
         base_options=mp.tasks.BaseOptions(model_asset_path=args.model),
         running_mode=mp.tasks.vision.RunningMode.LIVE_STREAM,
@@ -55,7 +51,6 @@ def main(args):
         result_callback=gesture_recognition_callback
     )
 
-    # Create the gesture recognizer outside the capture loop.
     with mp.tasks.vision.GestureRecognizer.create_from_options(options) as gesture_recognizer:
         while cap.isOpened():
             success, image = cap.read()
@@ -63,23 +58,18 @@ def main(args):
                 print("Ignoring empty camera frame.")
                 continue
 
-            # Record the start time for the current frame.
             start_time = time.time()
 
-            # Convert the frame to RGB as required by MediaPipe.
             numpy_frame = cv.cvtColor(image, cv.COLOR_BGR2RGB)
             mp_image_object = mp.Image(
                 image_format=mp.ImageFormat.SRGB,
                 data=numpy_frame
             )
 
-            # Compute a timestamp in milliseconds.
             frame_timestamp_ms = int((time.time() - start_time) * 1000)
 
-            # Send the frame to the gesture recognizer.
             gesture_recognizer.recognize_async(mp_image_object, timestamp_ms=frame_timestamp_ms)
 
-            # Process hand landmarks using MediaPipe Hands.
             results = hands.process(image)
             if results.multi_hand_landmarks:
                 for hand_landmarks in results.multi_hand_landmarks:
@@ -91,10 +81,8 @@ def main(args):
                         mp_drawing_styles.get_default_hand_connections_style(),
                     )
 
-            # Flip the image for a mirror view.
             image = cv.flip(image, 1)
 
-            # Display the recognized gesture on the frame.
             cv.putText(image, f"Gesture: {recognized_gesture}", (10, 700),
                        cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv.LINE_AA)
 
