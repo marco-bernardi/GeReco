@@ -123,6 +123,12 @@ after the cropping of the ROI and the resize of the frame, could appear stretche
 also the hands may be cut off because the body's keypoint does not include all the fingers.
 An example can be seen in the figure \ref{fig:stretchedImage}.
 We tried to \textbf{not cropping the images}, but by simply removing some pixels from the margin in a way to have all the body of the person in the image and less background.
+
+In addition to cropping the region of interest (ROI), we applied data augmentation techniques to the dataset, such as vertical flipping. 
+Since all gestures in the dataset were performed with the right hand, flipping the images allowed us to generate left-hand representations, effectively doubling the variability of the data.  
+To avoid significantly slowing down the training process, we decided not to apply additional transformations.  
+
+
 \begin{figure}[h]
    \centering
    \includegraphics[width=1\linewidth]{images/stretched.jpg}
