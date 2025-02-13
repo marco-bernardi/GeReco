@@ -3,9 +3,32 @@ import numpy as np
 import time
 import mediapipe as mp
 import argparse
+from huggingface_hub import hf_hub_download
+import os
+
+STATIC_MODEL = "static_gesture_recognizer.task"
+REPO_ID = "Seba213/rgb-dhgr-dataset"
+dataset = hf_hub_download(repo_id=REPO_ID, filename=STATIC_MODEL, repo_type="dataset")
 
 recognized_gesture = ""
 landmark_list = []
+
+def get_model_path(model_path):
+    """Check if the model file exists locally; if not, download it."""
+    if model_path and os.path.exists(model_path):
+        print(f"Using provided model: {model_path}")
+        return os.path.abspath(model_path)  # Usa il percorso assoluto
+
+    default_model_path = os.path.join(os.getcwd(), STATIC_MODEL)
+
+    if os.path.exists(default_model_path):
+        print(f"Model already exists: {default_model_path}")
+        return os.path.abspath(default_model_path)  # Usa il percorso assoluto
+
+    print("No model path provided. Downloading the model from Hugging Face...")
+    downloaded_model = hf_hub_download(repo_id=REPO_ID, filename=STATIC_MODEL, repo_type="dataset")
+    print(f"Model downloaded to: {downloaded_model}")
+    return os.path.abspath(downloaded_model)  # Usa il percorso assoluto
 
 def gesture_recognition_callback(results: mp.tasks.vision.GestureRecognizerResult,
                                  output_image: mp.Image,
@@ -28,6 +51,9 @@ def main(args):
     cap_device = args.device
     cap_width = 960
     cap_height = 540
+    
+    model_path = get_model_path(args.model)
+    print(f"Using model: {model_path}")
 
     cap = cv.VideoCapture(cap_device)
     cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
@@ -45,7 +71,7 @@ def main(args):
     )
 
     options = mp.tasks.vision.GestureRecognizerOptions(
-        base_options=mp.tasks.BaseOptions(model_asset_path=args.model),
+        base_options=mp.tasks.BaseOptions(model_asset_path=model_path),
         running_mode=mp.tasks.vision.RunningMode.LIVE_STREAM,
         num_hands=2,
         result_callback=gesture_recognition_callback
@@ -100,7 +126,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--model',
         type=str,
-        default='static_gesture_recognizer.task',
+        default='',
         help='Path to the gesture recognizer model file.'
     )
     parser.add_argument(
