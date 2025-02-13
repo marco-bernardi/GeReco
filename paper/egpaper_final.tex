@@ -253,50 +253,41 @@ learning models, particularly in gesture recognition tasks.
    \caption{Best results of the model trained on the well splitted dynamic gestures dataset.}
    \label{tab:dynamicGesturesWell}
 \end{table}
-A thing that we can say about the dataset based on the crop of the hands is that it was to small for the 
-fact that mediapipe was not able to recognize the hands in all the frames of the videos, and the model 
-could not have seen enough variations in the data to generalize well. \\
+One observation about the dataset, based on the cropping of the hands, is that it was too small. 
+As a result, Mediapipe was unable to recognize the hands in all frames of the videos, and the model 
+did not see enough variations in the data to generalize well. \\
 \begin{figure}[h]
    \centering
    \includegraphics[width=1\linewidth]{images/rightDatasetHandsCrop.png}
    \caption{Confusion matrix of the model trained with the hands cropped dataset.}
    \label{fig:handCropConfusionMatrix}
 \end{figure}
-Also in the confusion matrix presented \ref{fig:handCropConfusionMatrix} we can see that a lot of immages 
-were lost during the preprocessing. We can see that the model is able to well classify only three classes out 
-of six.
-
-For the images without crop we can see that the accuracy is quite low and the model is not 
-able again to classify well all the types of gestures.
+Additionally, in the confusion matrix presented in Figure~\ref{fig:handCropConfusionMatrix}, 
+we can see that many images were lost during preprocessing. 
+The model is able to classify only three out of six classes well. \\
+For the images without cropping, we can see that the accuracy is quite low, and the model is still unable to classify all gesture types correctly.
 \begin{figure}[h]
    \centering
    \includegraphics[width=1\linewidth]{images/matrix_confusion2.png}
-   \caption{Confusion matrix of the model trained with the no crop dataset.}
+   \caption{Confusion matrix of the model trained with the no-crop dataset.}
    \label{fig:noCropConfusionMatrix}
 \end{figure} \\
-In the confusion matrix presented \ref{fig:noCropConfusionMatrix} we can clearly see 
-that examples are not dropped and the only not well recognized class is the \textit{zoom in}.
-In a real time recognition system this second model worked better than the 
-first one, but the accuracy was still too low to be used in a real application.
+In the confusion matrix presented in Figure~\ref{fig:noCropConfusionMatrix}, we can clearly see that no examples were dropped, and the only class that was not well recognized is \textit{zoom in}.  
+In a real-time recognition system, this second model performed better than the first one, but its accuracy was still too low for use in a real application.
 
-\section{Conclusion and future works}
-In this project we focused more on the modification of the dataset to recover frames lost 
-during the preprocessing instead of finding a way to choose other frames, so this is 
-a possible work to do to improve the model.
-We can say that with more resources we could get better results in less time, 
-specially for the dynamic gestures:
-\begin{itemize}
-   \item \textbf{Camera} for the real time recognition;
-   \item \textbf{GPU} for the training of the models;
-   \item \textbf{Memory} to store more data and process all the frames of the videos.
-\end{itemize}
-Another possible work to do is to try to combine the prediction of the keypoints of the hands
-with the prediction of the keypoints of the body in order to have a better cropped images in the 
-preprocessing phase. 
-The model for the static gesture recognition worked well and thanks to the transfer learning 
-we were able to get good results in a short time. The model for the dynamic gesture recognition
-was more complex, it has been necessary a deep study on the dataset and the preprocessing and a lot of time 
-and run trying to get the best possible results.
+\section{Conclusion and Future Work}  
+In this project, we focused more on modifying the dataset to recover frames lost during preprocessing rather than finding an alternative way to select frames. This presents a possible avenue for future improvements to the model.  
+
+With more resources, we could achieve better results in less time, especially for dynamic gestures:  
+\begin{itemize}  
+   \item \textbf{Camera} for real-time recognition;  
+   \item \textbf{GPU} for training the models;  
+   \item \textbf{Memory} to store more data and process all video frames.  
+\end{itemize}  
+
+Another potential improvement is to combine the prediction of hand keypoints with the prediction of body keypoints to obtain better-cropped images during preprocessing.  
+
+The model for static gesture recognition performed well, and thanks to transfer learning, we achieved good results in a short time. On the other hand, the model for dynamic gesture recognition was more complex. A deep study of the dataset and preprocessing was necessary, along with extensive experimentation to achieve the best possible results.  
 
 {\small
 \bibliographystyle{ieee_fullname}
