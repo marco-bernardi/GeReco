@@ -55,22 +55,26 @@ The goal of this project is to study, implement and test some approaches to gest
 the hand while in the second one we recognize the movement. 
 We also tried to implement a real time gesture recognition system using a webcam and the developed models.
 \section{Related Work}
+There are many approaches to gesture recognition. Our goal was to study some of them and explore their implementation, either directly or through transfer learning, to adapt them to our problem.  
+For static gesture recognition, we utilized \textit{MediaPipe Hands} \cite{zhang2020mediapipehandsondevicerealtime}, a solution developed by Google. We adapted the model by fine-tuning it to accurately classify the specific gestures required for our application.  
+% PAPER -> https://iris.unimore.it/retrieve/handle/11380/1212263/282584/3DV_2020.pdf  
+One of the approaches we explored in the literature was fine-tuning a \textit{Vision Transformer (ViT)} for dynamic gesture recognition. While ViTs have shown promising results in computer vision tasks, we ultimately did not pursue this approach due to its high computational requirements and the need for large-scale training data.  
+Finally, we decided to implement a custom model for dynamic gesture recognition, similar to the one proposed by Yaseen et al. \cite{electronics13163233}. This model consists of three main components: \textit{MediaPipe}, \textit{InceptionV3}, and \textit{LSTM}.  
 
-There are many apporaches to gesture recognition. What we have done is to study some of them and try to implement or to use transfer learning to adapt them to our problem. \\
-For static gesture recognition, we utilized \textit{MediaPipe Hands} \cite{zhang2020mediapipehandsondevicerealtime}, a solution developed by Google. We adapted the model by fine-tuning it to accurately classify the specific gestures required for our application. \\
-% PAPER -> https://iris.unimore.it/retrieve/handle/11380/1212263/282584/3DV_2020.pdf
-One of the approaches we explored in the literature was fine-tuning a \textit{Vision Transformer (ViT)} for dynamic gesture recognition. While ViTs have shown promising results in computer vision tasks, we did not pursue this approach due to its high computational requirements and the need for large-scale training data. \\
-Finally we decided to implement a custom model to detect dynamic gestures similar to the one proposed by Yaseen et al.\cite{electronics13163233}, that consists on three layers: \textit{Mediapipe}, \textit{InceptionV3} and \textit{LSTM}.
+\section{Dataset}  
+The dataset is a crucial component of this project. We required two types of datasets:  
 
-\section{Dataset}
-Clearly the dataset is a crucial part of the project and obviously we needed two kind of dataset:
-\begin{itemize}
-   \item Dataset of \textbf{static gestures}: we used a reduced version of the \textit{HaGRID dataset} \cite{Alexander_2024}. The original dataset is too big for our purposes and for our resources, it contains about 550000 Full-HD images (716GB) divided in 18 classes of gestures. So we decided to use only about 2000 images divided in 6 classes of gestures.
-   \item Dataset of \textbf{dynamic gestures}: we used the \textit{Depth camera based dataset of hand gestures} \cite{JEERU2022108659}. In this case there are about 4000 videos of 
-   6 different gestures.
-\end{itemize}
+\begin{itemize}  
+   \item \textbf{Dataset of static gestures}: We used a reduced version of the \textit{HaGRID dataset} \cite{Alexander_2024}.  
+   The original dataset is too large for our purposes and available resources, as it contains approximately 550,000 Full-HD images (716GB) divided into 18 gesture classes.  
+   Therefore, we selected a subset of about 2,000 images, distributed across 6 gesture classes.  
 
-MANCA LA DESCRIZIONE DELLA STRUTTURA DEL DATASET PER LE GESTURE DINAMICHE
+   \item \textbf{Dataset of dynamic gestures}: We used the \textit{Depth Camera-Based Dataset of Hand Gestures} \cite{JEERU2022108659}.  
+   This dataset contains both RGB and depth video frames of various hand movements, including scroll-right/left, scroll-up/down, and zoom-in/out. Each sequence consists of 40 frames, with a total of 662 sequences.  
+   For our approach, we used only the RGB frames. To comply with the authors’ instructions, we selected 10 frames from each sequence, sampling one every 4 frames from the original 40-frame sequence.  
+\end{itemize}  
+
+
 
 \section{Method}
 \subsection{Static gestures}
@@ -106,38 +110,11 @@ the units of the network to 0 at each update during training time.
 \subsection{Dynamic gestures}
 \subsubsection{Data preprocessing}
 \label{subsec:datapreprocessing}
-The data preprocessing for the dynamic gestures was more complex than the one for the static gestures. As seen in the 
-paper \cite{electronics13163233} the idea was to take 10 frames from the video equispaced and to crop the 
-\textbf{region of interest (ROI) on the hands} in order to not consider useless information of the background.
+The data preprocessing for the dynamic gestures was more complex than the one for the static gestures. As seen in the paper \cite{electronics13163233} the idea was to take 10 frames from the video equispaced and to crop the \textbf{region of interest (ROI) on the hands} in order to not consider useless information of the background.
 After this the image should be resized to a 50x60, but InceptionV3 requires a minimum size 
 of 75x75, so we decided to use those dimensions.
-We noticed different things that were not considered, starting from the fact that there was no transformation 
-to improve the quality of the images. After cropping and resizing the images the quality was 
-not good enough to be used for the training. We decided to apply some transformations and the results is the 
-one which is presented in the image \ref{fig:transformation_hands}.
-We also flipped the images on the vertical axis in a way to recognize the gestures done by both hands.
-The idea to consider as ROI only the hands was not the best one for us, because in the dataset, the gestures 
-were done with the whole arm and not only with the hands. Furthermore, not in all images mediapipe is able to 
-recognize hands and so frames are dropped, but vectors of the same size are required by the \textit{LSTM}. In this way there was a big reduction of the whole dataset.
-To solve these problems we tried to train the model by \textbf{cropping the images on the body} of the person 
-as in the image \ref{fig:transformation_body}.
-We tried to use the \textbf{full image} without cropping but with the full image the model was not able to learn, probably 
-because the person was too far from the camera and the background was the biggest part of the image.
-The last try was to \textbf{crop directly on the arms} detected by mediapipe, specifying the ROI: considering the \href{https://ai.google.dev/static/mediapipe/images/solutions/pose_landmarks_index.png}{keypoints of the pose detected by mediapipe}, we have selected the ROI covered by the keypoints from 11 to 22. WAITING THE RESULTS\dots
--palo o chiattone
-
-\begin{figure*}[h]
-   \centering
-   \includegraphics[width=\textwidth]{images/transformation_hands.jpg} 
-   \caption{Transformations on ROI of the hands.}
-   \label{fig:transformation_hands}
-\end{figure*}
-\begin{figure*}[h]
-   \centering
-   \includegraphics[width=\textwidth]{images/transformation_body.jpg} 
-   \caption{Transformations on ROI of the body.}
-   \label{fig:transformation_body}
-\end{figure*}
+The idea to consider as ROI only the hands was not the best one for us, because in the dataset, the gestures were done with the whole arm and not only with the hands. Furthermore, not in all images mediapipe is able to recognize hands and so frames are dropped, but vectors of the same size are required by the \textit{LSTM}. In this way there was a big reduction of the whole dataset.
+To solve these problems we tried to train the model by \textbf{cropping the images on the body} of the person.
 \subsubsection{Model}
 The pipeline is similar to the one explained by Yaseen et al \cite{electronics13163233}, it is composed by three main parts:
 \begin{enumerate}
@@ -171,7 +148,8 @@ was the overfitting. We tried to solve this problem by using:
    \item \textit{L2 regularization}: it works by adding a penalty to the loss function;
    \item \textit{early stopping}: it works by stopping the training when the validation loss 
    has no improvement for a certain number of epochs. We set the number of \textit{epochs} to 
-   300 and for our purposes there were too many since it overfitted after fewer epochs.
+   300 and for our purposes there were too many since it overfitted after fewer epochs;
+   \item \textit{Batch normalization}: it works by normalizing the input of the layer in order to have normalized data with zero mean and unit variance.
 \end{itemize}
 We also found here a trade-off between efficiency and accuracy by tuninig 
 the \textit{batch size} and the \textit{learning rate}.
@@ -210,7 +188,62 @@ augmented dataset, intrducing enough variability in the dataset in order to
 improve the robustness of the model, but not too much to make data too different from the original one.
 At lower percentages the model could not have seen enough variations in the data to generalize well, and at 
 higher percentages the model could have seen too many variations making the learning less effective.
-\subsection{Dynamic gestures}
+\subsection{Dynamic Gestures}
+The initial experiment aimed to replicate the behavior of the model proposed by Yaseen et al. \cite{electronics13163233}, using the same dataset split and hyperparameters.  
+The results showed that the performance metrics were similar to those obtained by the authors. However, despite achieving high test accuracy, the model failed to correctly classify gestures in a real-life test environment.  
+
+Our initial hypothesis was that cropping images around the hands might not be the optimal approach. By focusing solely on the hands, the model lost crucial contextual information related to the gesture, particularly the position of the arms and the movement of the body.
+To address this issue, we leveraged MediaPipe pose detection to refine the cropping strategy, using keypoints as regions of interest (ROI). However, this modification did not lead to significant improvements in classification performance.  
+
+These findings suggest that the issue was not related to the cropping strategy.  
+
+\subsubsection{The Dataset Problem}
+Further research highlighted that the issue stemmed from the dataset. The dataset was not properly split between training and testing.  
+Due to the nature of the examples, some samples were very similar to each other, leading the model to potentially classify gestures based on background and the color of the subject’s clothing rather than their actual motion.  
+This resulted in high metric values but poor generalization.  
+Ad that the dataset was not well splitted, we decided to manually split (instead of using a random split) the dataset in order to have clearly different examples between train and test.
+
+\subsubsection{Results}
+Initially, we were able to replicate the results obtained by Yaseen et al. \cite{electronics13163233}
+as shown in Table \ref{tab:dynamicGesturesBad}, but only when using an incorrect dataset split.  
+\begin{table}[h]
+   \begin{center}
+   \begin{tabular}{|c|c|c|c|c|}
+   \hline
+   \textbf{Cropping} & \textbf{Val\_loss} & \textbf{Val\_Acc.} & \textbf{Test\_loss} & \textbf{Test\_Acc.}\\
+   \hline\hline
+   hands & 0.32 & 0.91 & 0.33 & 0.92 \\
+   pose & 2.15 & 0.89 & 2.18 & 0.90 \\
+   \hline
+   \end{tabular}
+   \end{center}
+   \caption{Results of the model trained on the bad splitted dynamic gestures dataset.}
+   \label{tab:dynamicGesturesBad}
+\end{table} \\
+This suggests that the original high accuracy was likely influenced by data leakage, where similar examples appeared in both the training and test sets. 
+
+After manually restructuring the dataset to ensure a clear separation between training and test samples, we observed a significant drop in accuracy. 
+(see Table \ref{tab:dynamicGesturesWell}).
+However, this decline indicated a more realistic performance evaluation, revealing the model’s actual ability to generalize to unseen gestures.  
+These findings emphasize the importance of a well-structured dataset split when evaluating deep learning models, particularly in gesture recognition tasks.
+% DATI TABELLA DA SISTEMARE %%%%%%%%%%%%%%%%%%%%
+\begin{table}[h]
+   \begin{center}
+   \begin{tabular}{|c|c|c|c|c|}
+   \hline
+   \textbf{Cropping} & \textbf{Val\_loss} & \textbf{Val\_Acc.} & \textbf{Test\_loss} & \textbf{Test\_Acc.}\\
+   \hline\hline
+   hands & 0.13 & 0.90 & 0.17 & 0.87 \\
+   pose & 0.19 & 0.86 & 0.19 & 0.87 \\
+   \hline
+   \end{tabular}
+   \end{center}
+   \caption{Results of the model trained on the well splitted dynamic gestures dataset.}
+   \label{tab:dynamicGesturesWell}
+\end{table}
+A thing that we can say about the dataset based on the crop of the hands is that it was to small for the fact that mediapipe was not able to recognize the hands in all the frames of the videos, and the model could not have seen enough variations in the data to generalize well.
+
+
 \section{Conclusion and future works}
 In this project we focused more on the modification of the dataset to recover frames lost during the preprocessing
 instead of finding a way to choose other frames, so this is a possible work to do to improve the model.
@@ -220,7 +253,6 @@ We can say that with more resources we could get better results in less time, sp
    \item \textbf{GPU} for the training of the models;
    \item \textbf{Memory} to store more data and process all the frames of the videos.
 \end{itemize}
-results....
 
 {\small
 \bibliographystyle{ieee_fullname}
