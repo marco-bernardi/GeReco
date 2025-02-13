@@ -158,7 +158,7 @@ Epoch 10/10
 Test Loss: 0.3317
 Test Accuracy: 0.9204
 
-## Data Hands crop, right dataset split 
+## Data Hands crop, well splitted dataset 
 
 model = keras.models.Sequential()
 
@@ -222,3 +222,64 @@ Epoch 134/300
 Test Loss: 0.8669
 Test Accuracy: 0.8152
 
+# Training on no crop extracted features, well splitted dataset
+
+model = keras.models.Sequential()
+
+model.add(keras.layers.LSTM(2048,
+                            activation='tanh',
+                            recurrent_activation='sigmoid',
+                            dropout=0.5,
+                            kernel_regularizer=keras.regularizers.l2(1e-2),
+                            recurrent_dropout=0.5,
+                            input_shape=(X.shape[1], 2048)))
+
+model.add(keras.layers.BatchNormalization())
+
+model.add(keras.layers.Dense(512, activation='relu', kernel_regularizer=keras.regularizers.l2(1e-2)))
+
+model.add(keras.layers.BatchNormalization())
+
+model.add(keras.layers.Dropout(0.5))
+
+model.add(keras.layers.Dense(6, activation='softmax'))
+
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=1e-4),
+    loss=keras.losses.CategoricalCrossentropy(),  
+    metrics=['accuracy']
+)
+
+early_stopping = keras.callbacks.EarlyStopping(
+    monitor='val_loss',
+    patience=10,  
+)
+
+history = model.fit(
+    X,
+    y,
+    epochs=300,
+    batch_size=64,
+    validation_split=0.1,
+    shuffle=True,
+    callbacks=[early_stopping]
+)
+
+## run 1
+
+accuracy: 0.5960 - loss: 1.6499
+Test Loss: 2.1136
+Test Accuracy: 0.5262
+
+![Confusion matrix 1](matrix_confusion1.png)
+
+## run 2
+
+Epoch 109/300
+53/53 ━━━━━━━━━━━━━━━━━━━━ 7s 140ms/step - accuracy: 0.9704 - loss: 0.4959 - val_accuracy: 0.9122 - val_loss: 0.6875
+
+accuracy: 0.5252 - loss: 1.9556
+
+Test Loss: 1.9762 - Test Accuracy: 0.5381
+
+![Confusion matrix 2](matrix_confusion2.png)
