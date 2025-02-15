@@ -8,7 +8,6 @@ import os
 
 STATIC_MODEL = "static_gesture_recognizer.task"
 REPO_ID = "Seba213/rgb-dhgr-dataset"
-dataset = hf_hub_download(repo_id=REPO_ID, filename=STATIC_MODEL, repo_type="dataset")
 
 recognized_gesture = ""
 landmark_list = []
