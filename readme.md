@@ -36,10 +36,7 @@ Stores snapshots of training results and performance metrics.
 - **`MP_results.md`**: (Mediapipe) Contains logs of training results from multiple runs.
 
 ### `paper/`
-Contains the source files for the project paper.
-
-### `transformer/`
-Directory reserved for Transformer-based experiments (if applicable).
+Contains the source files for the project paper and the compiled pdf.
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
