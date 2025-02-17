@@ -1,4 +1,4 @@
-# GeReco
+# [GeReco](https://github.com/marco-bernardi/GeReco)
 
 ## Vision & Cognitive Systems Project
 
